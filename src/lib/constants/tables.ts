@@ -1,6 +1,8 @@
 import { IconEditPencil } from "../../icons/IconEditPencil";
 import { IconTrash } from "../../icons/IconTrash";
 import type { Column } from "../types/tables";
+import { UtilLookup } from "../utils/UtilLookup";
+import { GENDER_LOOKUP, STUDENT_CONTANT_RELATION_TYPE_LOOKUP } from "./lookups";
 
 export const COLUMN_FORMATS = {
   text: "text",
@@ -37,6 +39,8 @@ export const STUDENT_TABLE_COLUMNS: Column[] = [
     label: "Sexo",
     minWidth: "100px",
     maxWidth: "100px",
+    calculatedValue: (i) =>
+      UtilLookup.getLabelFromValue(GENDER_LOOKUP, i.gender),
   },
 ];
 
@@ -68,10 +72,50 @@ export const STUDENT_CONTACT_TABLE_COLUMNS: Column[] = [
   {
     id: "relation_type",
     label: "Parentesco",
+    calculatedValue: (i) =>
+      UtilLookup.getLabelFromValue(
+        STUDENT_CONTANT_RELATION_TYPE_LOOKUP,
+        i.relation_type,
+      ),
   },
   {
     id: "is_primary",
     label: "Principal",
+    calculatedValue: (item) => (item.is_primary ? "Sí" : "No"),
   },
-  ...CONTACT_TABLE_COLUMNS,
+  {
+    id: "first_name",
+    label: "Nombre",
+    calculatedValue: (i) => {
+      return i?.person_contacts?.first_name;
+    },
+  },
+  {
+    id: "last_name",
+    label: "Apellido",
+    calculatedValue: (i) => {
+      return i?.person_contacts?.last_name;
+    },
+  },
+  {
+    id: "phone",
+    label: "Teléfono",
+    calculatedValue: (i) => {
+      return i?.person_contacts?.phone;
+    },
+  },
+  {
+    id: "email",
+    label: "Correo",
+    calculatedValue: (i) => {
+      return i?.person_contacts?.email;
+    },
+  },
+  {
+    id: "address",
+    label: "Dirección",
+    calculatedValue: (i) => {
+      return i?.person_contacts?.address;
+    },
+  },
 ];

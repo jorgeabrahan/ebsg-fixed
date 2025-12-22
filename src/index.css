@@ -80,3 +80,16 @@ input[type="checkbox"] {
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  @apply bg-dark-925;
+}
+
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-contrast/20 rounded-full;
+}

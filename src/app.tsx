@@ -10,6 +10,8 @@ import { LayoutRoutes } from "./layouts/LayoutRoutes";
 import { PageContacts } from "./pages/contacts/PageContacts";
 import { PageNewContact } from "./pages/contacts/PageNewContact";
 import { PageContact } from "./pages/contacts/PageContact";
+import { PageStudentContact } from "./pages/students/student_contacts/PageStudentContact";
+import { PageNewStudentContact } from "./pages/students/student_contacts/PageNewStudentContact";
 
 export function App() {
   return (
@@ -44,6 +46,22 @@ export function App() {
           component={(props) => (
             <LayoutRoute type={ROUTES.student.type}>
               <PageStudent {...props} />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.studentContact.path}
+          component={(props) => (
+            <LayoutRoute type={ROUTES.studentContact.type}>
+              <PageStudentContact {...props} />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.studentContactsNew.path}
+          component={(props) => (
+            <LayoutRoute type={ROUTES.studentContactsNew.type}>
+              <PageNewStudentContact {...props} />
             </LayoutRoute>
           )}
         />

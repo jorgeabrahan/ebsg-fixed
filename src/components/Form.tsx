@@ -17,15 +17,27 @@ export const Form = ({
   const [validationResults, setValidationResults] = useState<
     { inputName: string; isSuccess: boolean; error?: string }[]
   >([]);
+  const removeLabelFields = (sanitizedEntries: Record<string, any>) => {
+    const result: Record<string, any> = {};
+    for (const key in sanitizedEntries) {
+      if (!key.includes("_label")) {
+        result[key] = sanitizedEntries[key];
+      }
+    }
+    return result;
+  };
   const sanitizeFields = (entries: Record<string, any>) => {
     const sanitizedEntries: Record<string, any> = {};
     fields.map((f) => {
-      if (
-        typeof f?.outputFormat === "function" &&
-        f?.name != null &&
-        typeof f?.name === "string"
-      ) {
+      if (f == null || typeof f?.name !== "string") return;
+      if (typeof f?.outputFormat === "function") {
         sanitizedEntries[f.name] = f.outputFormat(entries[f.name]);
+      }
+      // by default if checkbox is not checked it does NOT appear on entries
+      // and if it is true it appears as 'on'
+      // so the following code ensures the checkbox is always present and is a boolean
+      if (!isSelectField(f) && f.type === "checkbox") {
+        sanitizedEntries[f.name] = entries[f.name] != null;
       }
     });
     return { ...entries, ...sanitizedEntries };
@@ -57,7 +69,7 @@ export const Form = ({
     const originalEntries = Object.fromEntries(
       new FormData(e.target as HTMLFormElement),
     );
-    const sanitizedEntries = sanitizeFields(originalEntries);
+    const sanitizedEntries = removeLabelFields(sanitizeFields(originalEntries));
     const isAtLeastOneFieldInvalid = validateFields(
       sanitizedEntries,
       originalEntries,

@@ -2,7 +2,6 @@ import { useEffect, useState } from "preact/hooks";
 import type { PublicTable, ReadWhere } from "../lib/types/request";
 import type { Tables } from "../lib/types/database.types";
 import { ServiceCRUD } from "../services/ServiceCRUD";
-import { WrapperDelimiter } from "../wrappers/WrapperDelimiter";
 import { Table } from "./Table";
 import { toast } from "sonner";
 import { route } from "preact-router";
@@ -43,17 +42,15 @@ export default function ResourceList<K extends PublicTable>({
   }, []);
 
   return (
-    <WrapperDelimiter>
-      <Table
-        title={title}
-        columns={columns}
-        items={items}
-        onCreate={redirectCreate ? () => route(redirectCreate) : undefined}
-        onEdit={
-          redirectEdit ? (itemId) => route(redirectEdit(itemId)) : undefined
-        }
-        onDelete={() => {}}
-      />
-    </WrapperDelimiter>
+    <Table
+      title={title}
+      columns={columns}
+      items={items}
+      onCreate={redirectCreate ? () => route(redirectCreate) : undefined}
+      onEdit={
+        redirectEdit ? (itemId) => route(redirectEdit(itemId)) : undefined
+      }
+      onDelete={() => {}}
+    />
   );
 }

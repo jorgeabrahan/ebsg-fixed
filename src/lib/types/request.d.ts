@@ -7,6 +7,7 @@ export type CrudResponseTemplate<T> = {
   isSuccess: boolean;
   data: T | null;
   error: PostgrestError | null;
+  count?: number | null;
 };
 
 export type ReadWhere = {

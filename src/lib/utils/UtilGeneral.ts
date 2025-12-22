@@ -7,4 +7,6 @@ export class UtilGeneral {
     if (!Object.prototype.hasOwnProperty.call(obj, key)) return undefined;
     return obj[key];
   }
+  static normalizeSearchQuery = (q: string) =>
+    q.trim().replace(/\s+/g, " ").split(" ").join("%");
 }

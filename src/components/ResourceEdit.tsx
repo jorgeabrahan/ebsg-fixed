@@ -3,12 +3,12 @@ import type { FormDefinition } from "../lib/types/forms";
 import type { PublicTable } from "../lib/types/request";
 import { ServiceCRUD } from "../services/ServiceCRUD";
 import { route } from "preact-router";
-import { WrapperDelimiter } from "../wrappers/WrapperDelimiter";
 import { Form } from "./Form";
 import { IconEditPencil } from "../icons/IconEditPencil";
 import { UtilGeneral } from "../lib/utils/UtilGeneral";
 import { toast } from "sonner";
 import type { Tables } from "../lib/types/database.types";
+import { isSelectField } from "../lib/typeGuards/forms";
 
 export default function ResourceEdit<K extends PublicTable>({
   id,
@@ -16,12 +16,14 @@ export default function ResourceEdit<K extends PublicTable>({
   fields,
   redirectTo,
   submitLabel,
+  select = "*",
 }: {
   id?: string;
   table: K;
   fields: FormDefinition["fields"];
   redirectTo: string;
   submitLabel: string;
+  select?: string;
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [clonedFields, setClonedFields] =
@@ -31,6 +33,7 @@ export default function ResourceEdit<K extends PublicTable>({
   useEffect(() => {
     const fetchRow = async (id: string) => {
       const { isSuccess, data } = await ServiceCRUD.readOne<K>(table, {
+        select,
         id: Number(id),
       });
 
@@ -45,12 +48,32 @@ export default function ResourceEdit<K extends PublicTable>({
         prevFields.map((field) => {
           const raw = UtilGeneral.safeGet(data, field.name);
           if (raw == null) return field;
-
+          if (!isSelectField(field) && field.type === "checkbox") {
+            return {
+              ...field,
+              checked: !!raw,
+            };
+          }
           const normalized =
             typeof raw === "string" || typeof raw === "number"
               ? raw
               : String(raw);
-
+          if (
+            !isSelectField(field) &&
+            field.type === "reference" &&
+            field?.table &&
+            typeof field?.getReferenceLabel === "function"
+          ) {
+            const referenceData = data?.[field.table as keyof typeof data];
+            const referenceLabel = field.getReferenceLabel(
+              referenceData as unknown as Record<string, any>,
+            );
+            return {
+              ...field,
+              reference: normalized.toString(),
+              value: referenceLabel,
+            };
+          }
           return {
             ...field,
             value: normalized,
@@ -66,7 +89,6 @@ export default function ResourceEdit<K extends PublicTable>({
     fetchRow(id);
   }, [id]);
 
-  // SUBMIT: UPDATE THE RESOURCE
   const onSubmit = async ({
     sanitizedEntries,
   }: {
@@ -76,7 +98,6 @@ export default function ResourceEdit<K extends PublicTable>({
       toast.error("ID inválido, no se puede editar este recurso.");
       return;
     }
-    console.log(sanitizedEntries);
 
     const payload = {
       ...sanitizedEntries,
@@ -94,20 +115,18 @@ export default function ResourceEdit<K extends PublicTable>({
   };
 
   return (
-    <WrapperDelimiter>
-      <Form
-        className="my-10"
-        fields={clonedFields}
-        onSubmit={onSubmit}
-        onCancel={() => route(redirectTo)}
-        submitButton={
-          <>
-            <IconEditPencil />
-            <span>{submitLabel}</span>
-          </>
-        }
-        isDisabled={isLoading}
-      />
-    </WrapperDelimiter>
+    <Form
+      className="my-10"
+      fields={clonedFields}
+      onSubmit={onSubmit}
+      onCancel={() => route(redirectTo)}
+      submitButton={
+        <>
+          <IconEditPencil />
+          <span>{submitLabel}</span>
+        </>
+      }
+      isDisabled={isLoading}
+    />
   );
 }

@@ -18,6 +18,18 @@ export const ROUTES = {
     build: (studentId: string | number) => `/students/${studentId}`,
     type: ROUTE_ACCESS_CONDITION.authenticated,
   },
+  studentContact: {
+    path: "/students/:studentId/contacts/:contactId",
+    build: (studentId: string | number, contactId: string | number) =>
+      `/students/${studentId}/contacts/${contactId}`,
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
+  studentContactsNew: {
+    path: "/students/:studentId/contacts/new",
+    build: (studentId: string | number) =>
+      `/students/${studentId}/contacts/new`,
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
   studentsNew: {
     path: "/students/new",
     type: ROUTE_ACCESS_CONDITION.authenticated,

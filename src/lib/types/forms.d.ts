@@ -4,6 +4,7 @@ import type {
   ComponentType,
   TargetedSubmitEvent,
 } from "preact";
+import type { PublicTable } from "./request";
 
 type BaseField = {
   label: string;
@@ -18,6 +19,7 @@ type BaseField = {
     isSuccess: boolean;
     error?: string;
   };
+  isDisabledByDefault?: boolean;
 };
 
 type InputHTMLProps = Omit<
@@ -27,8 +29,22 @@ type InputHTMLProps = Omit<
 export type TextField = BaseField &
   InputHTMLProps & {
     name: string;
-    type: "text" | "email" | "password" | "number" | "date" | "tel";
+    type:
+      | "text"
+      | "email"
+      | "password"
+      | "number"
+      | "date"
+      | "tel"
+      | "reference"
+      | "checkbox";
     required?: boolean;
+    reference?: string;
+    table?: PublicTable;
+    select?: string;
+    getReferenceLabel?: (item: Record<string, any>) => string;
+    getReferenceEditPath?: (itemId: string) => string;
+    referenceListPath?: string;
   };
 
 type SelectHTMLProps = Omit<ComponentProps<"select">, "id" | "className">;
@@ -36,7 +52,7 @@ export type SelectField = BaseField &
   SelectHTMLProps & {
     name: string;
     defaultValue: string;
-    options: { label: string; value: string }[];
+    options: readonly { label: string; value: string }[];
   };
 
 export type FormDefinition = {

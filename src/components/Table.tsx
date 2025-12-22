@@ -169,11 +169,10 @@ export const Table = ({
       window.removeEventListener("click", handleClickOutside);
     };
   }, [contextMenu]);
-
   return (
     <>
       <section>
-        {(title || isCreatable) && (
+        {((title != null && title.length > 0) || isCreatable) && (
           <header className={"flex items-center justify-between gap-2 py-3"}>
             <h2 className="text-3xl font-bold">{title}</h2>
             {isCreatable && (
@@ -235,18 +234,22 @@ export const Table = ({
                       />
                     </TableCell>
                   )}
-                  {columns.map((col) => (
-                    <TableCell key={col.id} label={col.label}>
-                      <span className={"block text-sm"}>
-                        {String(item[col.id]).length === 0 ? (
-                          <i className="text-dark-400">No definido</i>
-                        ) : null}
-                        {typeof col.calculatedValue === "function"
-                          ? col.calculatedValue(item)
-                          : formatCellValue(item[col.id], col.format ?? "text")}
-                      </span>
-                    </TableCell>
-                  ))}
+                  {columns.map((col) => {
+                    const colValue =
+                      typeof col.calculatedValue === "function"
+                        ? col.calculatedValue(item)
+                        : formatCellValue(item[col.id], col.format ?? "text");
+                    return (
+                      <TableCell key={col.id} label={col.label}>
+                        <span className={"block text-sm"}>
+                          {String(colValue).length === 0 ? (
+                            <i className="text-dark-400">No definido</i>
+                          ) : null}
+                          {colValue}
+                        </span>
+                      </TableCell>
+                    );
+                  })}
                   {hasActions && (
                     <TableCell label="Acciones">
                       <button
