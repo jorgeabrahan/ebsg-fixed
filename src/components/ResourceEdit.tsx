@@ -8,7 +8,7 @@ import { IconEditPencil } from "../icons/IconEditPencil";
 import { UtilGeneral } from "../lib/utils/UtilGeneral";
 import { toast } from "sonner";
 import type { Tables } from "../lib/types/database.types";
-import { isSelectField } from "../lib/typeGuards/forms";
+import { isSelectField, isTextAreaField } from "../lib/typeGuards/forms";
 
 export default function ResourceEdit<K extends PublicTable>({
   id,
@@ -48,7 +48,11 @@ export default function ResourceEdit<K extends PublicTable>({
         prevFields.map((field) => {
           const raw = UtilGeneral.safeGet(data, field.name);
           if (raw == null) return field;
-          if (!isSelectField(field) && field.type === "checkbox") {
+          if (
+            !isSelectField(field) &&
+            !isTextAreaField(field) &&
+            field.type === "checkbox"
+          ) {
             return {
               ...field,
               checked: !!raw,
@@ -60,6 +64,7 @@ export default function ResourceEdit<K extends PublicTable>({
               : String(raw);
           if (
             !isSelectField(field) &&
+            !isTextAreaField(field) &&
             field.type === "reference" &&
             field?.table &&
             typeof field?.getReferenceLabel === "function"

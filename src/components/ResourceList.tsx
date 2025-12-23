@@ -15,6 +15,7 @@ export default function ResourceList<K extends PublicTable>({
   redirectEdit,
   select = "*",
   where = [],
+  order = { column: "created_at", ascending: false },
 }: {
   table: K;
   columns: Column[];
@@ -23,6 +24,10 @@ export default function ResourceList<K extends PublicTable>({
   redirectEdit?: (id: number | string) => string;
   select?: string;
   where?: ReadWhere;
+  order?: {
+    column: string;
+    ascending: boolean;
+  };
 }) {
   const [items, setItems] = useState<Tables<K>[]>([]);
 
@@ -31,6 +36,7 @@ export default function ResourceList<K extends PublicTable>({
       const { isSuccess, data, error } = await ServiceCRUD.read<K>(table, {
         select,
         where,
+        order,
       });
       if (isSuccess && data) {
         setItems(data);

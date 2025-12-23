@@ -1,4 +1,4 @@
-import type { SelectField, TextField } from "../types/forms";
+import type { SelectField, TextAreaField, TextField } from "../types/forms";
 import { UtilFieldFormatter } from "../utils/UtilFieldFormatter";
 import { UtilFieldValidator } from "../utils/UtilFieldValidator";
 import { GENDER_LOOKUP, STUDENT_CONTANT_RELATION_TYPE_LOOKUP } from "./lookups";
@@ -50,11 +50,6 @@ export const STUDENT_BASE_FIELDS: (TextField | SelectField)[] = [
   },
 ];
 
-export const STUDENT_EDIT_FIELDS: (TextField | SelectField)[] =
-  STUDENT_BASE_FIELDS;
-export const STUDENT_CREATE_FIELDS: (TextField | SelectField)[] =
-  STUDENT_BASE_FIELDS;
-
 export const CONTACT_BASE_FIELDS: (TextField | SelectField)[] = [
   {
     label: "Nombre",
@@ -80,6 +75,8 @@ export const CONTACT_BASE_FIELDS: (TextField | SelectField)[] = [
     name: "phone",
     type: "text",
     required: true,
+    outputFormat: UtilFieldFormatter.sanitizePhone,
+    validation: UtilFieldValidator.phone,
   },
   {
     label: "Correo",
@@ -94,11 +91,6 @@ export const CONTACT_BASE_FIELDS: (TextField | SelectField)[] = [
     type: "text",
   },
 ];
-
-export const CONTACT_EDIT_FIELDS: (TextField | SelectField)[] =
-  CONTACT_BASE_FIELDS;
-export const CONTACT_CREATE_FIELDS: (TextField | SelectField)[] =
-  CONTACT_BASE_FIELDS;
 
 export const STUDENT_CONTACT_BASE_FIELDS: (TextField | SelectField)[] = [
   {
@@ -141,7 +133,61 @@ export const STUDENT_CONTACT_BASE_FIELDS: (TextField | SelectField)[] = [
   },
 ];
 
-export const STUDENT_CONTACT_CREATE_FIELDS: (TextField | SelectField)[] =
-  STUDENT_CONTACT_BASE_FIELDS;
-export const STUDENT_CONTACT_EDIT_FIELDS: (TextField | SelectField)[] =
-  STUDENT_CONTACT_BASE_FIELDS;
+export const SCHOOL_GRADES_BASE_FIELDS: (
+  | TextField
+  | SelectField
+  | TextAreaField
+)[] = [
+  {
+    label: "Nombre",
+    id: "name",
+    name: "name",
+    type: "text",
+    required: true,
+  },
+  {
+    label: "Descripción",
+    id: "description",
+    name: "description",
+    rows: 3,
+  },
+];
+
+export const ACADEMIC_YEARS_BASE_FIELDS: (
+  | TextField
+  | SelectField
+  | TextAreaField
+)[] = [
+  {
+    label: "Año",
+    id: "year_label",
+    name: "year_label",
+    type: "text",
+    required: true,
+  },
+  {
+    label: "Fecha de Inicio",
+    id: "start_date",
+    name: "start_date",
+    type: "date",
+    required: true,
+    validation: UtilFieldValidator.date,
+  },
+  {
+    label: "Fecha de Finalización",
+    id: "end_date",
+    name: "end_date",
+    type: "date",
+    required: true,
+    validation: UtilFieldValidator.compose(
+      UtilFieldValidator.date,
+      UtilFieldValidator.endDateAfterStart,
+    ),
+  },
+  {
+    label: "Activo",
+    id: "is_active",
+    name: "is_active",
+    type: "checkbox",
+  },
+];

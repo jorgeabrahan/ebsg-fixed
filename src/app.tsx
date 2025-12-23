@@ -12,6 +12,12 @@ import { PageNewContact } from "./pages/contacts/PageNewContact";
 import { PageContact } from "./pages/contacts/PageContact";
 import { PageStudentContact } from "./pages/students/student_contacts/PageStudentContact";
 import { PageNewStudentContact } from "./pages/students/student_contacts/PageNewStudentContact";
+import { PageSchoolGrades } from "./pages/school-grades/PageSchoolGrades";
+import { PageNewSchoolGrade } from "./pages/school-grades/PageNewSchoolGrade";
+import { PageSchoolGrade } from "./pages/school-grades/PageSchoolGrade";
+import { PageAcademicYears } from "./pages/academic-years/PageAcademicYears";
+import { PageNewAcademicYear } from "./pages/academic-years/PageNewAcademicYear";
+import { PageAcademicYear } from "./pages/academic-years/PageAcademicYear";
 
 export function App() {
   return (
@@ -86,6 +92,54 @@ export function App() {
           component={(props) => (
             <LayoutRoute type={ROUTES.contact.type}>
               <PageContact {...props} />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.schoolGrades.path}
+          component={() => (
+            <LayoutRoute type={ROUTES.schoolGrades.type}>
+              <PageSchoolGrades />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.schoolGradesNew.path}
+          component={() => (
+            <LayoutRoute type={ROUTES.schoolGradesNew.type}>
+              <PageNewSchoolGrade />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.schoolGrade.path}
+          component={(props) => (
+            <LayoutRoute type={ROUTES.schoolGrade.type}>
+              <PageSchoolGrade {...props} />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.academicYears.path}
+          component={() => (
+            <LayoutRoute type={ROUTES.academicYears.type}>
+              <PageAcademicYears />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.academicYearsNew.path}
+          component={() => (
+            <LayoutRoute type={ROUTES.academicYearsNew.type}>
+              <PageNewAcademicYear />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.academicYear.path}
+          component={(props) => (
+            <LayoutRoute type={ROUTES.academicYear.type}>
+              <PageAcademicYear {...props} />
             </LayoutRoute>
           )}
         />

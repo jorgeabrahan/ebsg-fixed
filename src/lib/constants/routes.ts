@@ -47,6 +47,34 @@ export const ROUTES = {
     path: "/contacts/new",
     type: ROUTE_ACCESS_CONDITION.authenticated,
   },
+  schoolGrades: {
+    path: "/school-grades",
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
+  schoolGrade: {
+    path: "/school-grades/:schoolGradeId",
+    build: (schoolGradeId: string | number) =>
+      `/school-grades/${schoolGradeId}`,
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
+  schoolGradesNew: {
+    path: "/school-grades/new",
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
+  academicYears: {
+    path: "/academic-years",
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
+  academicYear: {
+    path: "/academic-years/:academicYearId",
+    build: (academicYearId: string | number) =>
+      `/academic-years/${academicYearId}`,
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
+  academicYearsNew: {
+    path: "/academic-years/new",
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
   signIn: {
     path: "/sign-in",
     type: ROUTE_ACCESS_CONDITION.unauthenticated,

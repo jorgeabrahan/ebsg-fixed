@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import ResourceCreate from "../../../components/ResourceCreate";
-import { STUDENT_CONTACT_CREATE_FIELDS } from "../../../lib/constants/forms";
+import { STUDENT_CONTACT_BASE_FIELDS } from "../../../lib/constants/forms";
 import { ROUTES } from "../../../lib/constants/routes";
 import { WrapperDelimiter } from "../../../wrappers/WrapperDelimiter";
 import { ServiceCRUD } from "../../../services/ServiceCRUD";
@@ -33,7 +33,7 @@ export const PageNewStudentContact = ({
     fetchStudent(studentId);
   }, [studentId]);
   const populateStudent = (): FormDefinition["fields"] => {
-    return STUDENT_CONTACT_CREATE_FIELDS.map((f) => {
+    return STUDENT_CONTACT_BASE_FIELDS.map((f) => {
       if (f.id != "student_id") return f;
       return {
         ...f,
@@ -47,7 +47,7 @@ export const PageNewStudentContact = ({
       <ResourceCreate<"person_student_contacts">
         table="person_student_contacts"
         fields={
-          student != null ? populateStudent() : STUDENT_CONTACT_CREATE_FIELDS
+          student != null ? populateStudent() : STUDENT_CONTACT_BASE_FIELDS
         }
         redirectTo={
           studentId ? ROUTES.student.build(studentId) : ROUTES.students.path

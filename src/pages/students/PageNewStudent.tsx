@@ -1,4 +1,4 @@
-import { STUDENT_CREATE_FIELDS } from "../../lib/constants/forms";
+import { STUDENT_BASE_FIELDS } from "../../lib/constants/forms";
 import { ROUTES } from "../../lib/constants/routes";
 import ResourceCreate from "../../components/ResourceCreate";
 import { WrapperDelimiter } from "../../wrappers/WrapperDelimiter";
@@ -8,7 +8,7 @@ export const PageNewStudent = () => {
     <WrapperDelimiter>
       <ResourceCreate<"person_students">
         table="person_students"
-        fields={STUDENT_CREATE_FIELDS}
+        fields={STUDENT_BASE_FIELDS}
         redirectTo={ROUTES.students.path}
         submitLabel="Agregar estudiante"
       />

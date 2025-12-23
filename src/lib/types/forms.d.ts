@@ -4,18 +4,26 @@ import type {
   ComponentType,
   TargetedSubmitEvent,
 } from "preact";
-import type { PublicTable } from "./request";
+import type { PublicTable, ReadWhere } from "./request";
 
+export type FieldValidationParameters = {
+  sanitizedValue: any;
+  originalValue: string;
+  sanitizedEntries: Record<string, any>;
+  originalEntries: Record<string, any>;
+};
 type BaseField = {
   label: string;
   id: string;
   outputFormat?: (value: string) => any;
   // sanitizedValue is the returned value from the outputFormat function
   // originalValue is the value before sanitization
-  validation?: (
-    sanitizedValue: any,
-    originalValue?: string,
-  ) => {
+  validation?: ({
+    sanitizedValue,
+    originalValue,
+    sanitizedEntries,
+    originalEntries,
+  }: FieldValidationParameters) => {
     isSuccess: boolean;
     error?: string;
   };
@@ -42,9 +50,18 @@ export type TextField = BaseField &
     reference?: string;
     table?: PublicTable;
     select?: string;
+    where?: ReadWhere;
     getReferenceLabel?: (item: Record<string, any>) => string;
     getReferenceEditPath?: (itemId: string) => string;
     referenceListPath?: string;
+  };
+
+type TextAreaHTMLProps = Omit<ComponentProps<"textarea">, "id" | "className">;
+export type TextAreaField = BaseField &
+  TextAreaHTMLProps & {
+    name: string;
+    required?: boolean;
+    rows: number;
   };
 
 type SelectHTMLProps = Omit<ComponentProps<"select">, "id" | "className">;
@@ -56,7 +73,7 @@ export type SelectField = BaseField &
   };
 
 export type FormDefinition = {
-  fields: (TextField | SelectField)[];
+  fields: (TextField | SelectField | TextAreaField)[];
   onSubmit: (params: {
     e: TargetedSubmitEvent<HTMLFormElement>;
     originalEntries: Record<string, string | File>;

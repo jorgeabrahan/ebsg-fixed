@@ -1,19 +1,17 @@
 import type { ComponentProps } from "preact";
-import type { SelectField } from "../lib/types/forms";
+import type { TextAreaField } from "../lib/types/forms";
 
-export const Select = ({
+export const TextArea = ({
   label,
-  defaultValue,
-  options,
   className,
   validationErrors,
   isDisabledByDefault,
   ...props
-}: SelectField & {
+}: TextAreaField & {
   className?: string;
   validationErrors: { inputName: string; isSuccess: boolean; error?: string }[];
   isDisabledByDefault?: boolean;
-} & ComponentProps<"select">) => {
+} & ComponentProps<"textarea">) => {
   const inputError = validationErrors?.find(
     (err) => err.inputName === props?.name,
   );
@@ -26,27 +24,29 @@ export const Select = ({
   return (
     <div>
       <div
-        className={`${className} ${applyDisabledStyle ? "opacity-50 cursor-not-allowed pointer-events-none" : ""} relative`}
+        className={`${className} ${
+          applyDisabledStyle ? "opacity-50 cursor-not-allowed" : ""
+        } relative`}
       >
         <label
-          className="absolute -top-3 left-3 font-semibold bg-neutral-800 px-1.5 rounded-sm"
+          className={`absolute -top-3 left-3 bg-neutral-800 rounded-sm px-1.5 font-semibold z-10`}
           htmlFor={props?.id}
         >
           {label}
         </label>
-        <select
-          className="field-base"
-          {...props}
-          tabIndex={isDisabledByDefault ? -1 : 0}
-        >
-          <option value="">{defaultValue}</option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+
+        <div className="flex items-stretch gap-1.5">
+          <textarea
+            className="field-base resize-none"
+            autoComplete="off"
+            {...props}
+            id={props?.id}
+            name={props?.name}
+            readOnly={isDisabledByDefault}
+          />
+        </div>
       </div>
+
       {showError && (
         <div className="text-red-300 font-semibold text-sm mt-1">
           {inputError.error}

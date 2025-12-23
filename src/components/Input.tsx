@@ -4,8 +4,6 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import type { Tables } from "../lib/types/database.types";
 import { useDebounce } from "@uidotdev/usehooks";
 import { ServiceCRUD } from "../services/ServiceCRUD";
-import { IconOpenInBrowser } from "../icons/IconOpenInBrowser";
-import { PrimaryButton } from "./PrimaryButton";
 import { route } from "preact-router";
 import { UtilGeneral } from "../lib/utils/UtilGeneral";
 import { IconList } from "../icons/IconList";
@@ -298,7 +296,7 @@ export const Input = ({
             className="field-base"
             autoComplete="off"
             {...props}
-            id={isReference ? `${props?.name}_label` : props?.name}
+            id={isReference ? `${props?.id}_label` : props?.id}
             name={isReference ? `${props?.name}_label` : props?.name}
             type={isReference ? "text" : props?.type}
             onFocus={onFocus}

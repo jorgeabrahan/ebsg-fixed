@@ -119,3 +119,30 @@ export const STUDENT_CONTACT_TABLE_COLUMNS: Column[] = [
     },
   },
 ];
+
+export const SCHOOL_GRADES_TABLE_COLUMNS: Column[] = [
+  { id: "id", label: "ID", minWidth: "100px", maxWidth: "100px" },
+  {
+    id: "name",
+    label: "Nombre",
+  },
+  {
+    id: "description",
+    label: "Descripción",
+  },
+];
+
+export const ACADEMIC_YEARS_TABLE_COLUMNS: Column[] = [
+  { id: "id", label: "ID", minWidth: "100px", maxWidth: "100px" },
+  {
+    id: "year_label",
+    label: "Año",
+  },
+  { id: "start_date", label: "Fecha de Inicio", format: "date" },
+  { id: "end_date", label: "Fecha de Finalización", format: "date" },
+  {
+    id: "is_active",
+    label: "Activa",
+    calculatedValue: (item) => (item.is_active ? "Sí" : "No"),
+  },
+];

@@ -2,9 +2,10 @@ import type { FormDefinition } from "../lib/types/forms";
 import { Input } from "./Input";
 import { PrimaryButton } from "./PrimaryButton";
 import { Select } from "./Select";
-import { isSelectField } from "../lib/typeGuards/forms";
+import { isSelectField, isTextAreaField } from "../lib/typeGuards/forms";
 import type { TargetedSubmitEvent } from "preact";
 import { useState } from "preact/hooks";
+import { TextArea } from "./TextArea";
 
 export const Form = ({
   fields,
@@ -20,9 +21,9 @@ export const Form = ({
   const removeLabelFields = (sanitizedEntries: Record<string, any>) => {
     const result: Record<string, any> = {};
     for (const key in sanitizedEntries) {
-      if (!key.includes("_label")) {
-        result[key] = sanitizedEntries[key];
-      }
+      if (key.includes("_label") && fields.find((f) => f.name === key) == null)
+        continue;
+      result[key] = sanitizedEntries[key];
     }
     return result;
   };
@@ -36,7 +37,7 @@ export const Form = ({
       // by default if checkbox is not checked it does NOT appear on entries
       // and if it is true it appears as 'on'
       // so the following code ensures the checkbox is always present and is a boolean
-      if (!isSelectField(f) && f.type === "checkbox") {
+      if (!isSelectField(f) && !isTextAreaField(f) && f.type === "checkbox") {
         sanitizedEntries[f.name] = entries[f.name] != null;
       }
     });
@@ -52,10 +53,12 @@ export const Form = ({
       if (typeof f?.validation === "function") {
         return {
           inputName,
-          ...f.validation(
-            sanitizedEntries[inputName],
-            originalEntries[inputName],
-          ),
+          ...f.validation({
+            sanitizedValue: sanitizedEntries[inputName],
+            originalValue: originalEntries[inputName],
+            sanitizedEntries,
+            originalEntries,
+          }),
         };
       }
       return { inputName, isSuccess: true };
@@ -87,6 +90,15 @@ export const Form = ({
         if (isSelectField(field)) {
           return (
             <Select
+              {...field}
+              disabled={isDisabled}
+              validationErrors={validationResults}
+            />
+          );
+        }
+        if (isTextAreaField(field)) {
+          return (
+            <TextArea
               {...field}
               disabled={isDisabled}
               validationErrors={validationResults}

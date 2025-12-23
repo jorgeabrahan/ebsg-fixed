@@ -97,13 +97,19 @@ export class ServiceCRUD {
         columns: string[];
         query: string;
       };
+      order?: {
+        column: string;
+        ascending: boolean;
+      };
     },
   ): Promise<CrudResponseTemplate<Tables<K>[]>> {
     try {
       let query = supabase
         .from(table)
         .select(params?.select ?? "*", { count: "exact" })
-        .order("created_at", { ascending: false });
+        .order(params?.order?.column ?? "created_at", {
+          ascending: params?.order?.ascending ?? false,
+        });
 
       // WHERE
       if (params?.where?.length) {
