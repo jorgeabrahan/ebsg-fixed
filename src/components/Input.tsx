@@ -289,7 +289,9 @@ export const Input = ({
     <div>
       <div
         className={`${className} ${
-          applyDisabledStyle ? "opacity-50 cursor-not-allowed" : ""
+          applyDisabledStyle
+            ? "[&_*:is(label,input)]:brightness-50 [&_*:is(label,input)]:cursor-not-allowed [&_*:is(label,input)]:pointer-events-none"
+            : ""
         } ${isSelector ? "flex items-center gap-1" : ""} relative`}
       >
         <label

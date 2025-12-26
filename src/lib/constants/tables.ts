@@ -193,7 +193,11 @@ export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULES_TABLE_COLUMNS: Column[] = [
   {
     id: "fee_type_periodicity",
     label: "Periodicidad",
-    calculatedValue: (i) => i?.finance_fee_types?.periodicity,
+    calculatedValue: (i) =>
+      UtilLookup.getLabelFromValue(
+        PERIODICITY_LOOKUP,
+        i?.finance_fee_types?.periodicity,
+      ),
   },
   {
     id: "amount",

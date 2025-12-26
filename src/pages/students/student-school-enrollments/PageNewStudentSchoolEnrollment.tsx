@@ -22,7 +22,7 @@ export const PageNewStudentSchoolEnrollment = ({
         redirectTo={
           studentId ? ROUTES.student.build(studentId) : ROUTES.students.path
         }
-        submitLabel="Agregar contacto"
+        submitLabel="Matricular estudiante"
       />
     </WrapperDelimiter>
   );

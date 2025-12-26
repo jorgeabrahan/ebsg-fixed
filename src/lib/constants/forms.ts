@@ -294,6 +294,13 @@ export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS: (
     table: "finance_fee_types",
     select: "id, code, periodicity",
     searchColumns: ["code"],
+    where: [
+      {
+        column: "periodicity",
+        operator: "neq",
+        value: "adhoc",
+      },
+    ],
     getReferenceLabel: (item) =>
       `${item.code} - ${UtilLookup.getLabelFromValue(PERIODICITY_LOOKUP, item.periodicity)}`,
     referenceListPath: ROUTES.financeFeeTypes.path,
@@ -324,6 +331,17 @@ export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS: (
     validation: UtilFieldValidator.amount,
   },
 ];
+
+export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_EDIT_FIELDS: (
+  | TextField
+  | SelectField
+)[] = ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS.map((f) => {
+  if (f.id === "amount") return f;
+  return {
+    ...f,
+    isDisabledByDefault: true,
+  };
+});
 
 export const FINANCE_FEE_TYPES_BASE_FIELDS: (
   | TextField
