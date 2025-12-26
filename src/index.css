@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "flowbite-react/plugin/tailwindcss";
+@source "../.flowbite-react/class-list.json";
 
 @theme {
   --color-contrast: #dedede;
@@ -91,5 +93,18 @@ input[type="checkbox"] {
 }
 
 .thin-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-contrast/20 rounded-full;
+}
+
+.sidebar > div::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.sidebar > div::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.sidebar > div::-webkit-scrollbar-thumb {
   @apply bg-contrast/20 rounded-full;
 }

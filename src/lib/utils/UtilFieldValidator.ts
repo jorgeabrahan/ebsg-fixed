@@ -31,6 +31,20 @@ export class UtilFieldValidator {
 
     return { isSuccess: true };
   }
+
+  static amount({ sanitizedValue }: FieldValidationParameters) {
+    const num = Number(sanitizedValue);
+    if (isNaN(num)) {
+      return { isSuccess: false, error: "Solo se permiten números" };
+    }
+
+    if (num <= 0) {
+      return { isSuccess: false, error: "El monto debe ser mayor a cero" };
+    }
+
+    return { isSuccess: true };
+  }
+
   static birthdate(
     { sanitizedValue }: FieldValidationParameters,
     config?: { isRequired: boolean },
@@ -144,6 +158,98 @@ export class UtilFieldValidator {
       return {
         isSuccess: false,
         error: "La fecha de finalización debe ser mayor que la fecha de inicio",
+      };
+    }
+
+    return { isSuccess: true };
+  }
+
+  static year(
+    { sanitizedValue }: FieldValidationParameters,
+    config?: {
+      isRequired?: boolean;
+      pastYearsAllowed?: number;
+      futureYearsAllowed?: number;
+    },
+  ) {
+    const isRequired = config?.isRequired ?? true;
+    const pastYearsAllowed = config?.pastYearsAllowed ?? 10;
+    const futureYearsAllowed = config?.futureYearsAllowed ?? 10;
+
+    if (
+      sanitizedValue === undefined ||
+      sanitizedValue === null ||
+      sanitizedValue === ""
+    ) {
+      return {
+        isSuccess: !isRequired,
+        error: isRequired ? "El año es obligatorio" : "",
+      };
+    }
+
+    const value = Number(sanitizedValue);
+
+    if (Number.isNaN(value)) {
+      return { isSuccess: false, error: "El año debe ser un número válido" };
+    }
+
+    if (!Number.isInteger(value)) {
+      return { isSuccess: false, error: "El año debe ser un número entero" };
+    }
+
+    if (!/^\d{4}$/.test(String(value))) {
+      return {
+        isSuccess: false,
+        error: "El año debe tener exactamente 4 dígitos (ejemplo: 2025)",
+      };
+    }
+
+    const currentYear = new Date().getFullYear();
+    const minYear = currentYear - pastYearsAllowed;
+    const maxYear = currentYear + futureYearsAllowed;
+
+    if (value < minYear) {
+      return {
+        isSuccess: false,
+        error: `El año no puede ser menor que ${minYear}`,
+      };
+    }
+
+    if (value > maxYear) {
+      return {
+        isSuccess: false,
+        error: `El año no puede ser mayor que ${maxYear}`,
+      };
+    }
+
+    return { isSuccess: true };
+  }
+
+  static feeCode({ originalValue }: FieldValidationParameters) {
+    if (!originalValue) {
+      return {
+        isSuccess: false,
+        error: "El código es obligatorio",
+      };
+    }
+
+    const value = originalValue.trim();
+
+    // No permitir espacios ni tabs en ninguna parte
+    if (/\s/.test(value)) {
+      return {
+        isSuccess: false,
+        error: "El código debe ser una sola palabra sin espacios",
+      };
+    }
+
+    const validPattern = /^[A-Za-z0-9_-]+$/;
+
+    if (!validPattern.test(value)) {
+      return {
+        isSuccess: false,
+        error:
+          "El código solo puede contener letras, números, guiones (-) o guiones bajos (_)",
       };
     }
 

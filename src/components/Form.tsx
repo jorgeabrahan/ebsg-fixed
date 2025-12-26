@@ -83,7 +83,7 @@ export const Form = ({
   };
   return (
     <form
-      className={`flex flex-col gap-6 ${className}`}
+      className={`flex flex-col gap-6 pt-4 pb-8 ${className}`}
       onSubmit={onSubmitMiddleware}
     >
       {fields.map((field) => {

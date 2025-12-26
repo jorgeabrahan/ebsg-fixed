@@ -15,3 +15,17 @@ export const GENDER_LOOKUP = [
   { label: "Masculino", value: "male" },
   { label: "Femenino", value: "female" },
 ] as const;
+
+export const PERIODICITY_LOOKUP = [
+  { label: "Mensual", value: "monthly" },
+  { label: "Una vez al año", value: "once-per-year" },
+  { label: "Una vez por grado", value: "once-per-grade" },
+  { label: "Ad hoc", value: "adhoc" },
+] as const;
+
+export const SCHOOL_ENROLLMENT_STATUS_LOOKUP = [
+  { label: "Matriculado", value: "enrolled" },
+  { label: "Retirado", value: "withdrawn" },
+  { label: "Graduado", value: "graduated" },
+  { label: "Abandono", value: "dropped_out" },
+] as const;

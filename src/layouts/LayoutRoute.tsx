@@ -9,6 +9,7 @@ import { ServiceAuth } from "../services/ServiceAuth";
 import { useEffect, useState } from "preact/hooks";
 import { user } from "../stores/session";
 import { route } from "preact-router";
+import { CSidebar } from "../components/CSidebar";
 
 export const LayoutRoute = ({
   children,
@@ -57,5 +58,10 @@ export const LayoutRoute = ({
   if (isCheckingUserAccess) {
     return <div>Loading...</div>;
   }
-  return children;
+  return (
+    <>
+      {type === ROUTE_ACCESS_CONDITION.authenticated && <CSidebar />}
+      <div className={"py-4"}>{children}</div>
+    </>
+  );
 };

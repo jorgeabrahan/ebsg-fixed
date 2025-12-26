@@ -22,6 +22,8 @@ export const Input = ({
   referenceListPath,
   searchColumns = ["first_name", "last_name"],
   getReferenceEditPath,
+  orderColumn = "created_at",
+  orderAscending = false,
   ...props
 }: {
   label?: string;
@@ -40,6 +42,8 @@ export const Input = ({
   referenceListPath?: string;
   searchColumns?: string[];
   getReferenceEditPath?: (itemId: string) => string;
+  orderColumn?: string;
+  orderAscending?: boolean;
 } & ComponentProps<"input">) => {
   const [showReferenceList, setShowReferenceList] = useState(false);
 
@@ -93,6 +97,10 @@ export const Input = ({
       select,
       where,
       pagination: { page: pageToLoad, pageSize: 10 },
+      order: {
+        column: orderColumn,
+        ascending: orderAscending,
+      },
     });
     setIsLoading(false);
 
@@ -202,7 +210,11 @@ export const Input = ({
           columns: searchColumns,
           query: normalized,
         },
-      } as any);
+        order: {
+          column: orderColumn,
+          ascending: orderAscending,
+        },
+      });
 
       setIsLoading(false);
 

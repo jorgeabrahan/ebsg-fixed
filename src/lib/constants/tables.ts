@@ -2,7 +2,12 @@ import { IconEditPencil } from "../../icons/IconEditPencil";
 import { IconTrash } from "../../icons/IconTrash";
 import type { Column } from "../types/tables";
 import { UtilLookup } from "../utils/UtilLookup";
-import { GENDER_LOOKUP, STUDENT_CONTANT_RELATION_TYPE_LOOKUP } from "./lookups";
+import {
+  GENDER_LOOKUP,
+  PERIODICITY_LOOKUP,
+  SCHOOL_ENROLLMENT_STATUS_LOOKUP,
+  STUDENT_CONTANT_RELATION_TYPE_LOOKUP,
+} from "./lookups";
 
 export const COLUMN_FORMATS = {
   text: "text",
@@ -120,6 +125,34 @@ export const STUDENT_CONTACT_TABLE_COLUMNS: Column[] = [
   },
 ];
 
+export const STUDENT_SCHOOL_ENROLLMENTS_TABLE_COLUMNS: Column[] = [
+  {
+    id: "year_label",
+    label: "Año academico",
+    calculatedValue: (i) => i?.school_academic_years?.year_label,
+  },
+  {
+    id: "school_grade",
+    label: "Grado",
+    calculatedValue: (item) => item?.school_grades?.name,
+  },
+  {
+    id: "section",
+    label: "Sección",
+  },
+  {
+    id: "created_at",
+    label: "Enrolado en",
+    format: "date",
+  },
+  {
+    id: "status",
+    label: "Status",
+    calculatedValue: (i) =>
+      UtilLookup.getLabelFromValue(SCHOOL_ENROLLMENT_STATUS_LOOKUP, i.status),
+  },
+];
+
 export const SCHOOL_GRADES_TABLE_COLUMNS: Column[] = [
   { id: "id", label: "ID", minWidth: "100px", maxWidth: "100px" },
   {
@@ -144,5 +177,44 @@ export const ACADEMIC_YEARS_TABLE_COLUMNS: Column[] = [
     id: "is_active",
     label: "Activa",
     calculatedValue: (item) => (item.is_active ? "Sí" : "No"),
+  },
+];
+export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULES_TABLE_COLUMNS: Column[] = [
+  {
+    id: "grade_id",
+    label: "Grado",
+    calculatedValue: (i) => i?.school_grades?.name,
+  },
+  {
+    id: "fee_type",
+    label: "Tipo de pago",
+    calculatedValue: (i) => i?.finance_fee_types?.name,
+  },
+  {
+    id: "fee_type_periodicity",
+    label: "Periodicidad",
+    calculatedValue: (i) => i?.finance_fee_types?.periodicity,
+  },
+  {
+    id: "amount",
+    label: "Monto",
+  },
+];
+
+export const FINANCE_FEE_TYPES_TABLE_COLUMNS: Column[] = [
+  { id: "id", label: "ID", minWidth: "100px", maxWidth: "100px" },
+  {
+    id: "code",
+    label: "Código",
+  },
+  {
+    id: "name",
+    label: "Nombre",
+  },
+  {
+    id: "periodicity",
+    label: "Periodicidad",
+    calculatedValue: (i) =>
+      UtilLookup.getLabelFromValue(PERIODICITY_LOOKUP, i.periodicity),
   },
 ];

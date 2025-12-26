@@ -10,6 +10,13 @@ import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 import { SimpleContextMenu } from "./SimpleContextMenu";
 import { PrimaryButton } from "./PrimaryButton";
 import { IconPlus } from "../icons/IconPlusCircle";
+import {
+  confirmationModalOptions,
+  isShowingConfirmationModal,
+} from "../stores/confirmationModal";
+import { ServiceCRUD } from "../services/ServiceCRUD";
+import type { PublicTable } from "../lib/types/request";
+import { toast } from "sonner";
 
 const TableCell = ({
   label,
@@ -37,23 +44,28 @@ const TableCell = ({
 };
 
 export const Table = ({
+  table,
   title,
   columns = [],
   items = [],
   isSelectable = true,
-  onDelete,
+  isDeletable = true,
   onCreate,
   onEdit,
+  onReload,
 }: {
+  table: PublicTable;
   title?: string;
   columns: Column[];
   items: Record<string, any>[];
   isSelectable?: boolean;
-  onDelete?: (id: string) => any;
+  isDeletable?: boolean;
   onCreate?: () => any;
   onEdit?: (id: string) => any;
+  onReload: () => Promise<void>;
 }) => {
   const refContextMenu = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
@@ -62,7 +74,6 @@ export const Table = ({
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const isCreatable = onCreate != null;
   const isEditable = onEdit != null;
-  const isDeletable = onDelete != null;
   const hasActions = isDeletable || isEditable;
 
   const TABLE_COLUMN_STYLES = {
@@ -135,6 +146,30 @@ export const Table = ({
     }
     setSelectedItems(items.map((item) => item.id));
   }, [items, selectedItems]);
+  const askForDeleteConfirmation = (id: string) => {
+    confirmationModalOptions.value = {
+      title: "Confirmar eliminación",
+      body: `¿Estás seguro de que deseas eliminar el elemento con id ${id} de la tabla ${title}?`,
+      onConfirm: async () => {
+        setIsLoading(true);
+        const toastId = toast.loading("Eliminando elemento...");
+        const { isSuccess, error } = await ServiceCRUD.delete(table, id);
+        if (isSuccess && error == null) {
+          console.log("a? ", toastId);
+          toast.success(`Elemento con id ${id} eliminado correctamente`, {
+            id: toastId,
+          });
+          await onReload();
+        } else {
+          toast.error(`Error al eliminar elemento con id ${id}`, {
+            id: toastId,
+          });
+        }
+        setIsLoading(false);
+      },
+    };
+    isShowingConfirmationModal.value = true;
+  };
   const resetContextMenu = useCallback(() => {
     setContextMenu(null);
   }, [setContextMenu]);
@@ -173,10 +208,14 @@ export const Table = ({
     <>
       <section>
         {((title != null && title.length > 0) || isCreatable) && (
-          <header className={"flex items-center justify-between gap-2 py-3"}>
+          <header className={"flex items-center justify-between gap-2 pb-3"}>
             <h2 className="text-3xl font-bold">{title}</h2>
             {isCreatable && (
-              <PrimaryButton size="lg" onClick={() => onCreate()}>
+              <PrimaryButton
+                size="lg"
+                onClick={() => onCreate()}
+                disabled={isLoading}
+              >
                 <IconPlus size={22} strokeWidth={2} />
                 <span>Nuevo</span>
               </PrimaryButton>
@@ -194,6 +233,8 @@ export const Table = ({
             {isSelectable && (
               <div className={"px-4 py-2 text-sm border-b border-dark-100"}>
                 <input
+                  name="selectAll"
+                  id="selectAll"
                   type="checkbox"
                   checked={
                     items.length === selectedItems.length && items.length > 0
@@ -253,6 +294,7 @@ export const Table = ({
                   {hasActions && (
                     <TableCell label="Acciones">
                       <button
+                        disabled={isLoading}
                         onClick={(e) => {
                           e.stopPropagation();
                           onToggleActions(e, item);
@@ -275,12 +317,12 @@ export const Table = ({
           reference={refContextMenu}
           actions={getMoreActions()}
           onAction={(actionId) => {
-            if (
-              actionId === MORE_ACTIONS.edit.id &&
-              isEditable &&
-              contextMenu != null
-            ) {
+            if (contextMenu == null) return;
+            if (actionId === MORE_ACTIONS.edit.id && isEditable) {
               onEdit(contextMenu.itemId);
+            }
+            if (actionId === MORE_ACTIONS.delete.id && isDeletable) {
+              askForDeleteConfirmation(contextMenu.itemId);
             }
           }}
         />

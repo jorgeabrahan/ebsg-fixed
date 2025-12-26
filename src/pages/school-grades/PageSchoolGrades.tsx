@@ -14,7 +14,7 @@ export const PageSchoolGrades = () => {
         redirectEdit={(id) => ROUTES.schoolGrade.build(id)}
         order={{
           column: "name",
-          ascending: false,
+          ascending: true,
         }}
       />
     </WrapperDelimiter>

@@ -45,7 +45,6 @@ export default function ResourceCreate<K extends PublicTable>({
   };
   return (
     <Form
-      className="my-10"
       fields={fields}
       onSubmit={onSubmit}
       onCancel={() => route(redirectTo)}

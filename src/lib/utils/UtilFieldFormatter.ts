@@ -42,4 +42,8 @@ export class UtilFieldFormatter {
 
     return `${country} ${number}`;
   }
+  static feeCode(value: string) {
+    if (!value) return "";
+    return value.trim().toUpperCase();
+  }
 }

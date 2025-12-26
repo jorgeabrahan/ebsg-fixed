@@ -121,7 +121,6 @@ export default function ResourceEdit<K extends PublicTable>({
 
   return (
     <Form
-      className="my-10"
       fields={clonedFields}
       onSubmit={onSubmit}
       onCancel={() => route(redirectTo)}

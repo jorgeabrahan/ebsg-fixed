@@ -1,4 +1,4 @@
-import { createElement, type ComponentType, type RefObject } from "preact";
+import { createElement, type RefObject } from "preact";
 import type { ContextMenuAction } from "../lib/types/tables";
 
 export const SimpleContextMenu = ({

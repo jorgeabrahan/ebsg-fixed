@@ -51,9 +51,12 @@ export type TextField = BaseField &
     table?: PublicTable;
     select?: string;
     where?: ReadWhere;
+    searchColumns?: string[];
     getReferenceLabel?: (item: Record<string, any>) => string;
     getReferenceEditPath?: (itemId: string) => string;
     referenceListPath?: string;
+    orderColumn?: string;
+    orderAscending?: boolean;
   };
 
 type TextAreaHTMLProps = Omit<ComponentProps<"textarea">, "id" | "className">;

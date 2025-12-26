@@ -30,6 +30,18 @@ export const ROUTES = {
       `/students/${studentId}/contacts/new`,
     type: ROUTE_ACCESS_CONDITION.authenticated,
   },
+  studentSchoolEnrollment: {
+    path: "/students/:studentId/school-enrollments/:schoolEnrollmentId",
+    build: (studentId: string | number, schoolEnrollmentId: string | number) =>
+      `/students/${studentId}/school-enrollments/${schoolEnrollmentId}`,
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
+  studentSchoolEnrollmentsNew: {
+    path: "/students/:studentId/school-enrollments/new",
+    build: (studentId: string | number) =>
+      `/students/${studentId}/school-enrollments/new`,
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
   studentsNew: {
     path: "/students/new",
     type: ROUTE_ACCESS_CONDITION.authenticated,
@@ -71,8 +83,37 @@ export const ROUTES = {
       `/academic-years/${academicYearId}`,
     type: ROUTE_ACCESS_CONDITION.authenticated,
   },
+  academicYearFinanceFeeSchedule: {
+    path: "/academic-years/:academicYearId/finance-fee-schedules/:financeFeeScheduleId",
+    build: (
+      academicYearId: string | number,
+      financeFeeScheduleId: string | number,
+    ) =>
+      `/academic-years/${academicYearId}/finance-fee-schedules/${financeFeeScheduleId}`,
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
+  academicYearFinanceFeeSchedulesNew: {
+    path: "/academic-years/:academicYearId/finance-fee-schedules/new",
+    build: (academicYearId: string | number) =>
+      `/academic-years/${academicYearId}/finance-fee-schedules/new`,
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
   academicYearsNew: {
     path: "/academic-years/new",
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
+  financeFeeTypes: {
+    path: "/finance-fee-types",
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
+  financeFeeType: {
+    path: "/finance-fee-types/:financeFeeTypeId",
+    build: (financeFeeTypeId: string | number) =>
+      `/finance-fee-types/${financeFeeTypeId}`,
+    type: ROUTE_ACCESS_CONDITION.authenticated,
+  },
+  financeFeeTypesNew: {
+    path: "/finance-fee-types/new",
     type: ROUTE_ACCESS_CONDITION.authenticated,
   },
   signIn: {

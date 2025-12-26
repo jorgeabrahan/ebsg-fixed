@@ -10,14 +10,21 @@ import { LayoutRoutes } from "./layouts/LayoutRoutes";
 import { PageContacts } from "./pages/contacts/PageContacts";
 import { PageNewContact } from "./pages/contacts/PageNewContact";
 import { PageContact } from "./pages/contacts/PageContact";
-import { PageStudentContact } from "./pages/students/student_contacts/PageStudentContact";
-import { PageNewStudentContact } from "./pages/students/student_contacts/PageNewStudentContact";
+import { PageStudentContact } from "./pages/students/student-contacts/PageStudentContact";
+import { PageNewStudentContact } from "./pages/students/student-contacts/PageNewStudentContact";
 import { PageSchoolGrades } from "./pages/school-grades/PageSchoolGrades";
 import { PageNewSchoolGrade } from "./pages/school-grades/PageNewSchoolGrade";
 import { PageSchoolGrade } from "./pages/school-grades/PageSchoolGrade";
 import { PageAcademicYears } from "./pages/academic-years/PageAcademicYears";
 import { PageNewAcademicYear } from "./pages/academic-years/PageNewAcademicYear";
 import { PageAcademicYear } from "./pages/academic-years/PageAcademicYear";
+import { PageFinanceFeeTypes } from "./pages/finance-fee-types/PageFinanceFeeTypes";
+import { PageNewFinanceFeeType } from "./pages/finance-fee-types/PageNewFinanceFeeType";
+import { PageFinanceFeeType } from "./pages/finance-fee-types/PageFinanceFeeType";
+import { PageStudentSchoolEnrollment } from "./pages/students/student-school-enrollments/PageStudentSchoolEnrollment";
+import { PageNewStudentSchoolEnrollment } from "./pages/students/student-school-enrollments/PageNewStudentSchoolEnrollment";
+import { PageAcademicYearFinanceFeeSchedule } from "./pages/academic-years/academic-year-finance-fee-schedules/PageAcademicYearFinanceFeeSchedule";
+import { PageNewAcademicYearFinanceFeeSchedule } from "./pages/academic-years/academic-year-finance-fee-schedules/PageNewAcademicYearFinanceFeeSchedule";
 
 export function App() {
   return (
@@ -68,6 +75,22 @@ export function App() {
           component={(props) => (
             <LayoutRoute type={ROUTES.studentContactsNew.type}>
               <PageNewStudentContact {...props} />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.studentSchoolEnrollment.path}
+          component={(props) => (
+            <LayoutRoute type={ROUTES.studentSchoolEnrollment.type}>
+              <PageStudentSchoolEnrollment {...props} />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.studentSchoolEnrollmentsNew.path}
+          component={(props) => (
+            <LayoutRoute type={ROUTES.studentSchoolEnrollmentsNew.type}>
+              <PageNewStudentSchoolEnrollment {...props} />
             </LayoutRoute>
           )}
         />
@@ -140,6 +163,54 @@ export function App() {
           component={(props) => (
             <LayoutRoute type={ROUTES.academicYear.type}>
               <PageAcademicYear {...props} />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.academicYear.path}
+          component={(props) => (
+            <LayoutRoute type={ROUTES.academicYear.type}>
+              <PageAcademicYear {...props} />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.academicYearFinanceFeeSchedule.path}
+          component={(props) => (
+            <LayoutRoute type={ROUTES.academicYearFinanceFeeSchedule.type}>
+              <PageAcademicYearFinanceFeeSchedule {...props} />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.academicYearFinanceFeeSchedulesNew.path}
+          component={(props) => (
+            <LayoutRoute type={ROUTES.academicYearFinanceFeeSchedulesNew.type}>
+              <PageNewAcademicYearFinanceFeeSchedule {...props} />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.financeFeeTypes.path}
+          component={() => (
+            <LayoutRoute type={ROUTES.financeFeeTypes.type}>
+              <PageFinanceFeeTypes />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.financeFeeTypesNew.path}
+          component={() => (
+            <LayoutRoute type={ROUTES.financeFeeTypesNew.type}>
+              <PageNewFinanceFeeType />
+            </LayoutRoute>
+          )}
+        />
+        <Route
+          path={ROUTES.financeFeeType.path}
+          component={(props) => (
+            <LayoutRoute type={ROUTES.financeFeeType.type}>
+              <PageFinanceFeeType {...props} />
             </LayoutRoute>
           )}
         />

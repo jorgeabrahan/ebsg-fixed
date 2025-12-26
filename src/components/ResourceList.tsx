@@ -30,33 +30,35 @@ export default function ResourceList<K extends PublicTable>({
   };
 }) {
   const [items, setItems] = useState<Tables<K>[]>([]);
+  const fetchItems = async () => {
+    const { isSuccess, data, error } = await ServiceCRUD.read<K>(table, {
+      select,
+      where,
+      order,
+    });
+
+    if (isSuccess && data) {
+      setItems(data);
+    } else {
+      toast.error(error?.message || "Ocurrió un error inesperado");
+    }
+  };
 
   useEffect(() => {
-    const fetchItems = async () => {
-      const { isSuccess, data, error } = await ServiceCRUD.read<K>(table, {
-        select,
-        where,
-        order,
-      });
-      if (isSuccess && data) {
-        setItems(data);
-        return;
-      }
-      toast.error(error?.message || "Ocurrió un error inesperado");
-    };
     fetchItems();
-  }, []);
+  }, [table, select, JSON.stringify(where), order.column, order.ascending]);
 
   return (
     <Table
       title={title}
+      table={table}
       columns={columns}
       items={items}
       onCreate={redirectCreate ? () => route(redirectCreate) : undefined}
       onEdit={
         redirectEdit ? (itemId) => route(redirectEdit(itemId)) : undefined
       }
-      onDelete={() => {}}
+      onReload={fetchItems}
     />
   );
 }

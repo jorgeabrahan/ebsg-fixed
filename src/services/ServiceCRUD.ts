@@ -63,12 +63,9 @@ export class ServiceCRUD {
     }
   }
 
-  static async delete<K extends PublicTable>(
-    table: K,
-    item: Record<string, any>,
-  ) {
+  static async delete<K extends PublicTable>(table: K, id: string) {
     try {
-      const { error } = await supabase.from(table).delete().eq("id", item.id);
+      const { error } = await supabase.from(table).delete().eq("id", id);
       if (error) throw error;
       return {
         isSuccess: true,

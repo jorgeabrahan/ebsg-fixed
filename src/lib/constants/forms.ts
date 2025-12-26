@@ -1,7 +1,13 @@
 import type { SelectField, TextAreaField, TextField } from "../types/forms";
 import { UtilFieldFormatter } from "../utils/UtilFieldFormatter";
 import { UtilFieldValidator } from "../utils/UtilFieldValidator";
-import { GENDER_LOOKUP, STUDENT_CONTANT_RELATION_TYPE_LOOKUP } from "./lookups";
+import { UtilLookup } from "../utils/UtilLookup";
+import {
+  GENDER_LOOKUP,
+  PERIODICITY_LOOKUP,
+  SCHOOL_ENROLLMENT_STATUS_LOOKUP,
+  STUDENT_CONTANT_RELATION_TYPE_LOOKUP,
+} from "./lookups";
 import { ROUTES } from "./routes";
 
 export const STUDENT_BASE_FIELDS: (TextField | SelectField)[] = [
@@ -74,6 +80,7 @@ export const CONTACT_BASE_FIELDS: (TextField | SelectField)[] = [
     id: "phone",
     name: "phone",
     type: "text",
+    placeholder: "9999 9999",
     required: true,
     outputFormat: UtilFieldFormatter.sanitizePhone,
     validation: UtilFieldValidator.phone,
@@ -100,6 +107,7 @@ export const STUDENT_CONTACT_BASE_FIELDS: (TextField | SelectField)[] = [
     type: "reference",
     table: "person_students",
     select: "id, first_name, last_name",
+    searchColumns: ["first_name", "last_name"],
     getReferenceLabel: (item) =>
       `${item.id} - ${item.first_name} ${item.last_name}`,
     required: true,
@@ -112,6 +120,7 @@ export const STUDENT_CONTACT_BASE_FIELDS: (TextField | SelectField)[] = [
     type: "reference",
     table: "person_contacts",
     select: "id, first_name, last_name",
+    searchColumns: ["first_name", "last_name"],
     getReferenceLabel: (item) =>
       `${item.id} - ${item.first_name} ${item.last_name}`,
     referenceListPath: ROUTES.contacts.path,
@@ -130,6 +139,68 @@ export const STUDENT_CONTACT_BASE_FIELDS: (TextField | SelectField)[] = [
     id: "is_primary",
     name: "is_primary",
     type: "checkbox",
+  },
+];
+
+export const STUDENT_SCHOOL_ENROLLMENT_BASE_FIELDS: (
+  | TextField
+  | SelectField
+)[] = [
+  {
+    label: "Estudiante",
+    id: "student_id",
+    name: "student_id",
+    type: "reference",
+    table: "person_students",
+    select: "id, first_name, last_name",
+    searchColumns: ["first_name", "last_name"],
+    getReferenceLabel: (item) =>
+      `${item.id} - ${item.first_name} ${item.last_name}`,
+    required: true,
+    isDisabledByDefault: true,
+  },
+  {
+    label: "Año academico",
+    id: "year_id",
+    name: "year_id",
+    type: "reference",
+    table: "school_academic_years",
+    select: "id, year_label",
+    searchColumns: ["year_label"],
+    getReferenceLabel: (item) => item.year_label,
+    referenceListPath: ROUTES.academicYears.path,
+    getReferenceEditPath: (itemId) => ROUTES.academicYear.build(itemId),
+    required: true,
+    orderColumn: "year_label",
+    orderAscending: false,
+  },
+  {
+    label: "Grado",
+    id: "grade_id",
+    name: "grade_id",
+    type: "reference",
+    table: "school_grades",
+    select: "id, name",
+    searchColumns: ["name"],
+    getReferenceLabel: (item) => item.name,
+    referenceListPath: ROUTES.schoolGrades.path,
+    getReferenceEditPath: (itemId) => ROUTES.schoolGrade.build(itemId),
+    required: true,
+    orderColumn: "name",
+    orderAscending: false,
+  },
+  {
+    label: "Sección",
+    id: "section",
+    name: "section",
+    type: "text",
+  },
+  {
+    label: "Status",
+    id: "status",
+    name: "status",
+    defaultValue: "-- Seleccione --",
+    options: SCHOOL_ENROLLMENT_STATUS_LOOKUP,
   },
 ];
 
@@ -162,8 +233,15 @@ export const ACADEMIC_YEARS_BASE_FIELDS: (
     label: "Año",
     id: "year_label",
     name: "year_label",
-    type: "text",
+    type: "number",
+    placeholder: "2025",
     required: true,
+    validation: (p) =>
+      UtilFieldValidator.year(p, {
+        isRequired: true,
+        pastYearsAllowed: 5,
+        futureYearsAllowed: 10,
+      }),
   },
   {
     label: "Fecha de Inicio",
@@ -190,4 +268,99 @@ export const ACADEMIC_YEARS_BASE_FIELDS: (
     name: "is_active",
     type: "checkbox",
   },
+];
+
+export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS: (
+  | TextField
+  | SelectField
+)[] = [
+  {
+    label: "Año academico",
+    id: "year_id",
+    name: "year_id",
+    type: "reference",
+    table: "school_academic_years",
+    select: "id, year_label",
+    searchColumns: ["year_label"],
+    getReferenceLabel: (item) => item.year_label,
+    isDisabledByDefault: true,
+    required: true,
+  },
+  {
+    label: "Tipo de pago",
+    id: "fee_type_id",
+    name: "fee_type_id",
+    type: "reference",
+    table: "finance_fee_types",
+    select: "id, code, periodicity",
+    searchColumns: ["code"],
+    getReferenceLabel: (item) =>
+      `${item.code} - ${UtilLookup.getLabelFromValue(PERIODICITY_LOOKUP, item.periodicity)}`,
+    referenceListPath: ROUTES.financeFeeTypes.path,
+    getReferenceEditPath: (itemId) => ROUTES.financeFeeType.build(itemId),
+    required: true,
+  },
+  {
+    label: "Grado",
+    id: "grade_id",
+    name: "grade_id",
+    type: "reference",
+    table: "school_grades",
+    select: "id, name",
+    searchColumns: ["name"],
+    getReferenceLabel: (item) => item.name,
+    referenceListPath: ROUTES.schoolGrades.path,
+    getReferenceEditPath: (itemId) => ROUTES.schoolGrade.build(itemId),
+    required: true,
+    orderColumn: "name",
+    orderAscending: false,
+  },
+  {
+    label: "Monto",
+    id: "amount",
+    name: "amount",
+    type: "number",
+    required: true,
+    validation: UtilFieldValidator.amount,
+  },
+];
+
+export const FINANCE_FEE_TYPES_BASE_FIELDS: (
+  | TextField
+  | SelectField
+  | TextAreaField
+)[] = [
+  {
+    label: "Nombre",
+    id: "name",
+    name: "name",
+    type: "text",
+    required: true,
+  },
+  {
+    label: "Periodicidad",
+    id: "periodicity",
+    name: "periodicity",
+    defaultValue: "-- Seleccione --",
+    options: PERIODICITY_LOOKUP,
+    required: true,
+  },
+];
+
+export const FINANCE_FEE_TYPES_EDIT_FIELDS: (
+  | TextField
+  | SelectField
+  | TextAreaField
+)[] = [
+  {
+    label: "Código",
+    id: "code",
+    name: "code",
+    type: "text",
+    required: true,
+    isDisabledByDefault: true,
+    outputFormat: UtilFieldFormatter.feeCode,
+    validation: UtilFieldValidator.feeCode,
+  },
+  ...FINANCE_FEE_TYPES_BASE_FIELDS,
 ];
