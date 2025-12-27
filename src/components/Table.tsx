@@ -233,8 +233,8 @@ export const Table = ({
             {isSelectable && (
               <div className={"px-4 py-2 text-sm border-b border-dark-100"}>
                 <input
-                  name="selectAll"
-                  id="selectAll"
+                  name={`selectAll${table}`}
+                  id={`selectAll${table}`}
                   type="checkbox"
                   checked={
                     items.length === selectedItems.length && items.length > 0

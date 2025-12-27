@@ -4,10 +4,22 @@ export class UtilFieldFormatter {
   }
   static capitalize(value: string): string {
     if (!value) return "";
+    console.log(
+      UtilFieldFormatter.singleSpace(value)
+        .toLocaleLowerCase("es")
+        .replace(
+          /\p{L}+/gu,
+          (word) => word.charAt(0).toLocaleUpperCase("es") + word.slice(1),
+        ),
+    );
     return UtilFieldFormatter.singleSpace(value)
-      .toLowerCase()
-      .replace(/\b\w/g, (char) => char.toUpperCase());
+      .toLocaleLowerCase("es")
+      .replace(
+        /\p{L}+/gu,
+        (word) => word.charAt(0).toLocaleUpperCase("es") + word.slice(1),
+      );
   }
+
   static sanitizePhone(value: string, defaultCountryCode = "+504"): string {
     if (!value) return "";
 
