@@ -15,13 +15,6 @@ export const Form = ({
   className,
   isDisabled = false,
 }: FormDefinition & { className?: string; isDisabled?: boolean }) => {
-  // const buildInitialValues = (fields: FormDefinition["fields"]) => {
-  //   const obj: Record<string, any> = {};
-  //   fields.forEach((f) => {
-  //     obj[f.name] = f.value ?? "";
-  //   });
-  //   return obj;
-  // };
   const buildInitialValues = (fields: FormDefinition["fields"]) => {
     const obj: Record<string, any> = {};
 
@@ -64,12 +57,6 @@ export const Form = ({
       if (typeof f?.outputFormat === "function") {
         sanitizedEntries[f.name] = f.outputFormat(entries[f.name]);
       }
-      // by default if checkbox is not checked it does NOT appear on entries
-      // and if it is true it appears as 'on'
-      // so the following code ensures the checkbox is always present and is a boolean
-      // if (!isSelectField(f) && !isTextAreaField(f) && f.type === "checkbox") {
-      //   sanitizedEntries[f.name] = entries[f.name] != null;
-      // }
     });
     return { ...entries, ...sanitizedEntries };
   };
@@ -115,7 +102,6 @@ export const Form = ({
   const handleValueChange = (name: string, value: any) => {
     setValues((v) => ({ ...v, [name]: value }));
   };
-  console.log(values);
 
   return (
     <form
