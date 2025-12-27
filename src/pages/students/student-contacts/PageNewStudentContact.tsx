@@ -9,16 +9,12 @@ export const PageNewStudentContact = ({
 }: {
   studentId?: string;
 }) => {
-  const { student, populateStudentInFields } = useStudentInFields(studentId);
+  const { fields } = useStudentInFields(STUDENT_CONTACT_BASE_FIELDS, studentId);
   return (
     <WrapperDelimiter>
       <ResourceCreate<"person_student_contacts">
         table="person_student_contacts"
-        fields={
-          student != null
-            ? populateStudentInFields(STUDENT_CONTACT_BASE_FIELDS)
-            : STUDENT_CONTACT_BASE_FIELDS
-        }
+        fields={fields}
         redirectTo={
           studentId ? ROUTES.student.build(studentId) : ROUTES.students.path
         }

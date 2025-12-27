@@ -1,43 +1,41 @@
 import { useEffect, useState } from "preact/hooks";
-import type { FormDefinition } from "../lib/types/forms";
+import type { FormDefinition, TextField } from "../lib/types/forms";
 import { ServiceCRUD } from "../services/ServiceCRUD";
-import type { Tables } from "../lib/types/database.types";
 
-export const useStudentInFields = (studentId?: string) => {
-  const [student, setStudent] = useState<Pick<
-    Tables<"person_students">,
-    "id" | "first_name" | "last_name"
-  > | null>(null);
+export const useStudentInFields = (
+  fields: FormDefinition["fields"],
+  studentId?: string,
+) => {
+  const [fieldsCopy, setFieldsCopy] =
+    useState<FormDefinition["fields"]>(fields);
   useEffect(() => {
-    const fetchStudent = async (id: string) => {
+    const studentField = fieldsCopy.find((f) => f.id === "student_id") as
+      | TextField
+      | undefined;
+    const fetchStudent = async (id: string, studentField: TextField) => {
       const { data, isSuccess } = await ServiceCRUD.readOne("person_students", {
         id: Number(id),
-        select: "id, first_name, last_name",
+        select: studentField.select,
       });
       if (!isSuccess || !data) {
         return;
       }
-      setStudent(data);
+      setFieldsCopy((prev) =>
+        prev.map((f) => {
+          if (f.id != "student_id") return f;
+          const field = f as TextField;
+          return {
+            ...field,
+            value: field?.getReferenceLabel?.(data as Record<string, any>),
+            reference: data?.id?.toString(),
+          };
+        }),
+      );
     };
-    if (!studentId) {
+    if (!studentId || !studentField) {
       return;
     }
-    fetchStudent(studentId);
+    fetchStudent(studentId, studentField);
   }, [studentId]);
-  const populateStudentInFields = (
-    fields: FormDefinition["fields"],
-  ): FormDefinition["fields"] => {
-    return fields.map((f) => {
-      if (f.id != "student_id") return f;
-      return {
-        ...f,
-        value: `${student?.first_name} ${student?.last_name}`,
-        reference: student?.id?.toString(),
-      };
-    });
-  };
-  return {
-    student,
-    populateStudentInFields,
-  };
+  return { fields: fieldsCopy };
 };

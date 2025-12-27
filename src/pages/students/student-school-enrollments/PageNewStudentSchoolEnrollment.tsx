@@ -9,16 +9,15 @@ export const PageNewStudentSchoolEnrollment = ({
 }: {
   studentId?: string;
 }) => {
-  const { student, populateStudentInFields } = useStudentInFields(studentId);
+  const { fields } = useStudentInFields(
+    STUDENT_SCHOOL_ENROLLMENT_BASE_FIELDS,
+    studentId,
+  );
   return (
     <WrapperDelimiter>
       <ResourceCreate<"school_enrollments">
         table="school_enrollments"
-        fields={
-          student != null
-            ? populateStudentInFields(STUDENT_SCHOOL_ENROLLMENT_BASE_FIELDS)
-            : STUDENT_SCHOOL_ENROLLMENT_BASE_FIELDS
-        }
+        fields={fields}
         redirectTo={
           studentId ? ROUTES.student.build(studentId) : ROUTES.students.path
         }

@@ -1,4 +1,4 @@
-import { STUDENT_BASE_FIELDS } from "../../lib/constants/forms";
+import { STUDENT_EDIT_FIELDS } from "../../lib/constants/forms";
 import { ROUTES } from "../../lib/constants/routes";
 import ResourceEdit from "../../components/ResourceEdit";
 import ResourceList from "../../components/ResourceList";
@@ -15,7 +15,7 @@ export const PageStudent = ({ studentId }: { studentId?: string }) => {
       <ResourceEdit<"person_students">
         id={studentId}
         table="person_students"
-        fields={STUDENT_BASE_FIELDS}
+        fields={STUDENT_EDIT_FIELDS}
         redirectTo={ROUTES.students.path}
         submitLabel="Editar estudiante"
       />

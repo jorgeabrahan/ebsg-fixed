@@ -6,6 +6,8 @@ import { Table } from "./Table";
 import { toast } from "sonner";
 import { route } from "preact-router";
 import type { Column } from "../lib/types/tables";
+import { Pagination } from "flowbite-react";
+import { Select } from "./Select";
 
 export default function ResourceList<K extends PublicTable>({
   table,
@@ -16,6 +18,8 @@ export default function ResourceList<K extends PublicTable>({
   select = "*",
   where = [],
   order = { column: "created_at", ascending: false },
+  pageSize = 20,
+  sortableColumns = [],
 }: {
   table: K;
   columns: Column[];
@@ -28,17 +32,32 @@ export default function ResourceList<K extends PublicTable>({
     column: string;
     ascending: boolean;
   };
+  pageSize?: number;
+  sortableColumns?: { value: string; label: string }[];
 }) {
   const [items, setItems] = useState<Tables<K>[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const [page, setPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+
+  const [orderBy, setOrderBy] = useState(order.column);
+  const [ascending, setAscending] = useState(order.ascending);
+
   const fetchItems = async () => {
-    const { isSuccess, data, error } = await ServiceCRUD.read<K>(table, {
+    const { isSuccess, data, error, count } = await ServiceCRUD.read<K>(table, {
       select,
       where,
-      order,
+      pagination: { page, pageSize },
+      order: {
+        column: orderBy,
+        ascending,
+      },
     });
 
     if (isSuccess && data) {
       setItems(data);
+      setTotalCount(count ?? 0);
     } else {
       toast.error(error?.message || "Ocurrió un error inesperado");
     }
@@ -46,19 +65,85 @@ export default function ResourceList<K extends PublicTable>({
 
   useEffect(() => {
     fetchItems();
-  }, [table, select, JSON.stringify(where), order.column, order.ascending]);
+  }, [
+    table,
+    select,
+    JSON.stringify(where),
+    orderBy,
+    ascending,
+    page,
+    pageSize,
+  ]);
 
   return (
-    <Table
-      title={title}
-      table={table}
-      columns={columns}
-      items={items}
-      onCreate={redirectCreate ? () => route(redirectCreate) : undefined}
-      onEdit={
-        redirectEdit ? (itemId) => route(redirectEdit(itemId)) : undefined
-      }
-      onReload={fetchItems}
-    />
+    <>
+      {sortableColumns.length > 0 && (
+        <div className="flex gap-4 items-center">
+          <Select
+            id={`orderBy${table}`}
+            name={`orderBy${table}`}
+            label="Ordenar por"
+            value={orderBy}
+            handleValueChange={(value) => {
+              setPage(1);
+              setOrderBy(value);
+            }}
+            options={sortableColumns}
+          />
+          <Select
+            id={`orderBy${table}`}
+            name={`orderBy${table}`}
+            label="Ordenar por"
+            value={ascending ? "asc" : "desc"}
+            handleValueChange={(value) => {
+              setPage(1);
+              setAscending(value === "asc");
+            }}
+            options={[
+              {
+                label: "Ascendente",
+                value: "asc",
+              },
+              {
+                label: "Descendente",
+                value: "desc",
+              },
+            ]}
+          />
+        </div>
+      )}
+
+      {/* ------------------------ */}
+      {/* TABLE */}
+      {/* ------------------------ */}
+      <Table
+        title={title}
+        table={table}
+        columns={columns}
+        items={items}
+        onCreate={redirectCreate ? () => route(redirectCreate) : undefined}
+        onEdit={
+          redirectEdit ? (itemId) => route(redirectEdit(itemId)) : undefined
+        }
+        onReload={fetchItems}
+      />
+
+      {/* ------------------------ */}
+      {/* PAGINATION */}
+      {/* ------------------------ */}
+      <div className="flex justify-end overflow-x-auto mt-4">
+        <Pagination
+          className={
+            "[&_button]:bg-dark-925 [&_button]:enabled:hover:bg-dark-900 [&_button]:border-none [&_li[aria-current]>button]:bg-dark-900"
+          }
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          previousLabel=""
+          nextLabel=""
+          showIcons
+        />
+      </div>
+    </>
   );
 }

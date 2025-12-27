@@ -71,7 +71,7 @@ type SelectHTMLProps = Omit<ComponentProps<"select">, "id" | "className">;
 export type SelectField = BaseField &
   SelectHTMLProps & {
     name: string;
-    defaultValue: string;
+    defaultValue?: string;
     options: readonly { label: string; value: string }[];
   };
 

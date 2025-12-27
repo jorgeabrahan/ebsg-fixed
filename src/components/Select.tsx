@@ -12,7 +12,11 @@ export const Select = ({
   ...props
 }: SelectField & {
   className?: string;
-  validationErrors: { inputName: string; isSuccess: boolean; error?: string }[];
+  validationErrors?: {
+    inputName: string;
+    isSuccess: boolean;
+    error?: string;
+  }[];
   isDisabledByDefault?: boolean;
   handleValueChange: (value: string) => void;
 } & ComponentProps<"select">) => {
@@ -46,7 +50,7 @@ export const Select = ({
           }}
           tabIndex={isDisabledByDefault ? -1 : 0}
         >
-          <option value="">{defaultValue}</option>
+          {defaultValue && <option value="">{defaultValue}</option>}
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

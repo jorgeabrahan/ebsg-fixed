@@ -12,6 +12,24 @@ export const PageStudents = () => {
         columns={STUDENT_TABLE_COLUMNS}
         redirectCreate={ROUTES.studentsNew.path}
         redirectEdit={(id) => ROUTES.student.build(id)}
+        sortableColumns={[
+          {
+            label: "Fecha de creación",
+            value: "created_at",
+          },
+          {
+            label: "Código",
+            value: "code",
+          },
+          {
+            label: "Nombre",
+            value: "first_name",
+          },
+          {
+            label: "Apellido",
+            value: "last_name",
+          },
+        ]}
       />
     </WrapperDelimiter>
   );

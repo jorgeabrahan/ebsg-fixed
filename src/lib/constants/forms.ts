@@ -12,15 +12,6 @@ import { ROUTES } from "./routes";
 
 export const STUDENT_BASE_FIELDS: (TextField | SelectField)[] = [
   {
-    label: "Código",
-    id: "code",
-    name: "code",
-    type: "text",
-    required: true,
-    outputFormat: (v) => v.trim(),
-    validation: UtilFieldValidator.code,
-  },
-  {
     label: "Nombre",
     id: "first_name",
     name: "first_name",
@@ -54,6 +45,20 @@ export const STUDENT_BASE_FIELDS: (TextField | SelectField)[] = [
     options: GENDER_LOOKUP,
     required: true,
   },
+];
+
+export const STUDENT_EDIT_FIELDS: (TextField | SelectField)[] = [
+  {
+    label: "Código",
+    id: "code",
+    name: "code",
+    type: "text",
+    required: true,
+    outputFormat: (v) => v.trim(),
+    validation: UtilFieldValidator.code,
+    isDisabledByDefault: true,
+  },
+  ...STUDENT_BASE_FIELDS,
 ];
 
 export const CONTACT_BASE_FIELDS: (TextField | SelectField)[] = [

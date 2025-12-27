@@ -45,7 +45,7 @@ export const Input = ({
   getReferenceEditPath?: (itemId: string) => string;
   orderColumn?: string;
   orderAscending?: boolean;
-  handleValueChange: (value: string) => void;
+  handleValueChange: (value: string | boolean) => void;
 } & ComponentProps<"input">) => {
   const [showReferenceList, setShowReferenceList] = useState(false);
 
@@ -277,15 +277,21 @@ export const Input = ({
   useEffect(() => {
     if (
       !reference ||
-      reference?.trim()?.length === 0 ||
+      reference.trim().length === 0 ||
       !props?.value ||
-      String(props?.value)?.trim().length === 0
+      String(props?.value).trim().length === 0
     )
       return;
+
+    // Si YA tenemos un label correcto, no lo vuelvas a pisar
+    if (selectedReference?.reference === reference) return;
+
     setSelectedReference({
       label: String(props?.value),
-      reference: reference,
+      reference,
     });
+
+    handleValueChange(reference);
   }, [reference, props?.value]);
 
   return (
@@ -316,9 +322,22 @@ export const Input = ({
             id={isReference ? `${props?.id}_label` : props?.id}
             name={isReference ? `${props?.name}_label` : props?.name}
             type={isReference ? "text" : props?.type}
-            value={props.value ?? ""}
+            {...(isSelector
+              ? { checked: Boolean(props.value) }
+              : {
+                  value: isReference
+                    ? (selectedReference?.label ?? props.value ?? "")
+                    : (props.value ?? ""),
+                })}
             onChange={(e) => {
               if (isReference) return;
+
+              if (isSelector) {
+                const checked = (e.target as HTMLInputElement).checked;
+                handleValueChange(checked);
+                return;
+              }
+
               props.onChange?.(e);
               handleValueChange((e.target as HTMLInputElement).value);
             }}
@@ -361,7 +380,7 @@ export const Input = ({
               type="hidden"
               id={props?.id}
               name={props?.name}
-              value={reference}
+              value={selectedReference?.reference ?? reference ?? ""}
               ref={refHiddenInput}
             />
 
