@@ -4,7 +4,7 @@ import { PrimaryButton } from "./PrimaryButton";
 import { Select } from "./Select";
 import { isSelectField, isTextAreaField } from "../lib/typeGuards/forms";
 import type { TargetedSubmitEvent } from "preact";
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { TextArea } from "./TextArea";
 
 export const Form = ({
@@ -15,9 +15,24 @@ export const Form = ({
   className,
   isDisabled = false,
 }: FormDefinition & { className?: string; isDisabled?: boolean }) => {
+  const buildInitialValues = (fields: FormDefinition["fields"]) => {
+    const obj: Record<string, any> = {};
+    fields.forEach((f) => {
+      obj[f.name] = f.value ?? "";
+    });
+    return obj;
+  };
+  const [values, setValues] = useState(() => buildInitialValues(fields));
   const [validationResults, setValidationResults] = useState<
     { inputName: string; isSuccess: boolean; error?: string }[]
   >([]);
+  useEffect(() => {
+    setValues((prev) => ({
+      ...prev,
+      ...buildInitialValues(fields),
+    }));
+  }, [fields]);
+
   const removeLabelFields = (sanitizedEntries: Record<string, any>) => {
     const result: Record<string, any> = {};
     for (const key in sanitizedEntries) {
@@ -69,18 +84,23 @@ export const Form = ({
   };
   const onSubmitMiddleware = (e: TargetedSubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const originalEntries = Object.fromEntries(
-      new FormData(e.target as HTMLFormElement),
-    );
-    const sanitizedEntries = removeLabelFields(sanitizeFields(originalEntries));
-    const isAtLeastOneFieldInvalid = validateFields(
-      sanitizedEntries,
-      originalEntries,
-    );
-    if (!isAtLeastOneFieldInvalid) {
-      onSubmit({ e, originalEntries, sanitizedEntries });
+
+    const sanitized = removeLabelFields(sanitizeFields(values));
+
+    const invalid = validateFields(sanitized, values);
+    if (!invalid) {
+      onSubmit({
+        e,
+        originalEntries: values,
+        sanitizedEntries: sanitized,
+      });
     }
   };
+
+  const handleValueChange = (name: string, value: any) => {
+    setValues((v) => ({ ...v, [name]: value }));
+  };
+
   return (
     <form
       className={`flex flex-col gap-6 pt-4 pb-8 ${className}`}
@@ -91,7 +111,8 @@ export const Form = ({
           return (
             <Select
               {...field}
-              disabled={isDisabled}
+              value={values[field.name]}
+              handleValueChange={(v) => handleValueChange(field.name, v)}
               validationErrors={validationResults}
             />
           );
@@ -100,15 +121,18 @@ export const Form = ({
           return (
             <TextArea
               {...field}
-              disabled={isDisabled}
+              value={values[field.name]}
+              handleValueChange={(v) => handleValueChange(field.name, v)}
               validationErrors={validationResults}
             />
           );
         }
+
         return (
           <Input
             {...field}
-            disabled={isDisabled}
+            value={values[field.name]}
+            handleValueChange={(v) => handleValueChange(field.name, v)}
             validationErrors={validationResults}
           />
         );

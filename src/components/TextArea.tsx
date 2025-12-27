@@ -6,11 +6,13 @@ export const TextArea = ({
   className,
   validationErrors,
   isDisabledByDefault,
+  handleValueChange,
   ...props
 }: TextAreaField & {
   className?: string;
   validationErrors: { inputName: string; isSuccess: boolean; error?: string }[];
   isDisabledByDefault?: boolean;
+  handleValueChange: (value: string) => void;
 } & ComponentProps<"textarea">) => {
   const inputError = validationErrors?.find(
     (err) => err.inputName === props?.name,
@@ -42,6 +44,11 @@ export const TextArea = ({
             {...props}
             id={props?.id}
             name={props?.name}
+            value={props.value ?? ""}
+            onInput={(e) => {
+              props.onChange?.(e);
+              handleValueChange((e.target as HTMLTextAreaElement).value);
+            }}
             readOnly={isDisabledByDefault}
           />
         </div>

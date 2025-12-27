@@ -24,6 +24,7 @@ export const Input = ({
   getReferenceEditPath,
   orderColumn = "created_at",
   orderAscending = false,
+  handleValueChange,
   ...props
 }: {
   label?: string;
@@ -44,6 +45,7 @@ export const Input = ({
   getReferenceEditPath?: (itemId: string) => string;
   orderColumn?: string;
   orderAscending?: boolean;
+  handleValueChange: (value: string) => void;
 } & ComponentProps<"input">) => {
   const [showReferenceList, setShowReferenceList] = useState(false);
 
@@ -141,6 +143,7 @@ export const Input = ({
     setReferenceList(cachedBaseList);
     setHighlightIndex(-1);
     setShowReferenceList(false);
+    handleValueChange(selected.reference);
   };
 
   // --------------------
@@ -313,6 +316,12 @@ export const Input = ({
             id={isReference ? `${props?.id}_label` : props?.id}
             name={isReference ? `${props?.name}_label` : props?.name}
             type={isReference ? "text" : props?.type}
+            value={props.value ?? ""}
+            onChange={(e) => {
+              if (isReference) return;
+              props.onChange?.(e);
+              handleValueChange((e.target as HTMLInputElement).value);
+            }}
             onFocus={onFocus}
             onBlur={onBlur}
             onInput={onInput}

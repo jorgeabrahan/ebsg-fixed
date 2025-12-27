@@ -8,11 +8,13 @@ export const Select = ({
   className,
   validationErrors,
   isDisabledByDefault,
+  handleValueChange,
   ...props
 }: SelectField & {
   className?: string;
   validationErrors: { inputName: string; isSuccess: boolean; error?: string }[];
   isDisabledByDefault?: boolean;
+  handleValueChange: (value: string) => void;
 } & ComponentProps<"select">) => {
   const inputError = validationErrors?.find(
     (err) => err.inputName === props?.name,
@@ -37,6 +39,11 @@ export const Select = ({
         <select
           className="field-base"
           {...props}
+          value={props.value ?? ""}
+          onChange={(e) => {
+            props.onChange?.(e);
+            handleValueChange(e.currentTarget?.value);
+          }}
           tabIndex={isDisabledByDefault ? -1 : 0}
         >
           <option value="">{defaultValue}</option>
