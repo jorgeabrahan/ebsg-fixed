@@ -27,7 +27,7 @@ const TableCell = ({
 }) => {
   return (
     <div
-      className={`flex justify-between ${label ? "items-center md:items-start" : "items-end md:justify-center"} md:flex-col p-4`}
+      className={`flex justify-between ${label ? "items-center md:items-start" : "items-end md:justify-center"} md:flex-col px-4 py-6`}
     >
       {label && (
         <span

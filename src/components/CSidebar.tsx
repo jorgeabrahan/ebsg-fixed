@@ -42,7 +42,7 @@ export function CSidebar() {
         </button>
       </header>
       <Sidebar
-        className={`mr-4 [&>div]:h-screen fixed top-0 overflow-y-auto -translate-x-full transition-transform duration-500 md:translate-0 md:sticky md:float-left [&>div]:md:rounded-2xl [&>div]:md:h-[calc(100vh-32px)] [&>div]:md:my-4 [&>div]:md:ml-4 [&>div]:bg-gradient-to-b [&>div]:from-dark-925/60 [&>div]:to-dark-950 [&>div]:backdrop-blur-xl xl:w-80 sidebar ${showSidebar && "translate-x-0"}`}
+        className={`mr-4 [&>div]:h-screen fixed top-0 overflow-y-auto -translate-x-full transition-transform duration-500 md:translate-0 md:sticky md:float-left [&>div]:bg-dark-925/80 xl:w-80 sidebar ${showSidebar && "translate-x-0"}`}
       >
         <a
           className={"flex items-center gap-2 mb-4 pl-1"}

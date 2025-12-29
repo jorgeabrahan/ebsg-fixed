@@ -12,6 +12,7 @@ export type FieldValidationParameters = {
   sanitizedEntries: Record<string, any>;
   originalEntries: Record<string, any>;
 };
+export type FieldSizeVariants = "md" | "lg";
 type BaseField = {
   label: string;
   id: string;
@@ -28,6 +29,7 @@ type BaseField = {
     error?: string;
   };
   isDisabledByDefault?: boolean;
+  variant?: FieldSizeVariants;
 };
 
 type InputHTMLProps = Omit<

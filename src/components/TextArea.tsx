@@ -7,6 +7,7 @@ export const TextArea = ({
   validationErrors,
   isDisabledByDefault,
   handleValueChange,
+  variant = "lg",
   ...props
 }: TextAreaField & {
   className?: string;
@@ -31,7 +32,7 @@ export const TextArea = ({
         } relative`}
       >
         <label
-          className={`absolute -top-3 left-3 bg-neutral-800 rounded-sm px-1.5 font-semibold z-10`}
+          className={`absolute -top-2 left-4 bg-dark-950 rounded-sm px-1.5 text-sm z-10`}
           htmlFor={props?.id}
         >
           {label}
@@ -39,7 +40,7 @@ export const TextArea = ({
 
         <div className="flex items-stretch gap-1.5">
           <textarea
-            className="field-base resize-none"
+            className={`field-base resize-none field-base-${variant}`}
             autoComplete="off"
             {...props}
             id={props?.id}

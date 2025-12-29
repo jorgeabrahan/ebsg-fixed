@@ -74,11 +74,10 @@ export default function ResourceList<K extends PublicTable>({
     page,
     pageSize,
   ]);
-
   return (
     <>
       {sortableColumns.length > 0 && (
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-col md:flex-row md:items-center gap-3 mb-6 md:mb-3">
           <Select
             id={`orderBy${table}`}
             name={`orderBy${table}`}
@@ -89,11 +88,12 @@ export default function ResourceList<K extends PublicTable>({
               setOrderBy(value);
             }}
             options={sortableColumns}
+            variant="md"
           />
           <Select
             id={`orderBy${table}`}
             name={`orderBy${table}`}
-            label="Ordenar por"
+            label=""
             value={ascending ? "asc" : "desc"}
             handleValueChange={(value) => {
               setPage(1);
@@ -109,13 +109,11 @@ export default function ResourceList<K extends PublicTable>({
                 value: "desc",
               },
             ]}
+            variant="md"
           />
         </div>
       )}
 
-      {/* ------------------------ */}
-      {/* TABLE */}
-      {/* ------------------------ */}
       <Table
         title={title}
         table={table}
@@ -128,22 +126,21 @@ export default function ResourceList<K extends PublicTable>({
         onReload={fetchItems}
       />
 
-      {/* ------------------------ */}
-      {/* PAGINATION */}
-      {/* ------------------------ */}
-      <div className="flex justify-end overflow-x-auto mt-4">
-        <Pagination
-          className={
-            "[&_button]:bg-dark-925 [&_button]:enabled:hover:bg-dark-900 [&_button]:border-none [&_li[aria-current]>button]:bg-dark-900"
-          }
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={setPage}
-          previousLabel=""
-          nextLabel=""
-          showIcons
-        />
-      </div>
+      {totalPages > 1 && (
+        <div className="flex justify-end overflow-x-auto mt-4">
+          <Pagination
+            className={
+              "[&_button]:bg-dark-925 [&_button]:enabled:hover:bg-dark-900 [&_button]:border-none [&_li[aria-current]>button]:bg-dark-900"
+            }
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            previousLabel=""
+            nextLabel=""
+            showIcons
+          />
+        </div>
+      )}
     </>
   );
 }

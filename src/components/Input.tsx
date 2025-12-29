@@ -8,6 +8,7 @@ import { route } from "preact-router";
 import { UtilGeneral } from "../lib/utils/UtilGeneral";
 import { IconList } from "../icons/IconList";
 import { IconEditPencil } from "../icons/IconEditPencil";
+import type { FieldSizeVariants } from "../lib/types/forms";
 
 export const Input = ({
   label,
@@ -25,6 +26,7 @@ export const Input = ({
   orderColumn = "created_at",
   orderAscending = false,
   handleValueChange,
+  variant = "lg",
   ...props
 }: {
   label?: string;
@@ -46,6 +48,7 @@ export const Input = ({
   orderColumn?: string;
   orderAscending?: boolean;
   handleValueChange: (value: string | boolean) => void;
+  variant?: FieldSizeVariants;
 } & ComponentProps<"input">) => {
   const [showReferenceList, setShowReferenceList] = useState(false);
 
@@ -307,8 +310,8 @@ export const Input = ({
           className={`${
             isSelector
               ? "order-1"
-              : "absolute -top-3 left-3 bg-neutral-800 rounded-sm"
-          } px-1.5 font-semibold z-10`}
+              : "absolute -top-2 left-4 bg-dark-950 rounded-sm"
+          } px-1.5 text-sm z-10`}
           htmlFor={isReference ? `${props?.id}_label` : props?.id}
         >
           {label}
@@ -316,7 +319,7 @@ export const Input = ({
 
         <div className="flex items-stretch gap-1.5">
           <input
-            className="field-base"
+            className={`field-base field-base-${variant}`}
             autoComplete="off"
             {...props}
             id={isReference ? `${props?.id}_label` : props?.id}
@@ -350,7 +353,7 @@ export const Input = ({
 
           {isReference && referenceListPath && (
             <button
-              className="px-3 bg-neutral-800 rounded-sm border-2 border-neutral-400 focus:border-neutral-300"
+              className="px-3 bg-dark-950 rounded-3xl border-2 border-neutral-400 focus:border-neutral-300"
               onClick={() => route(referenceListPath)}
               type="button"
               title="Abrir lista"
@@ -362,7 +365,7 @@ export const Input = ({
             typeof getReferenceEditPath === "function" &&
             selectedReference?.reference && (
               <button
-                className="px-3 bg-neutral-800 rounded-sm border-2 border-neutral-400 focus:border-neutral-300"
+                className="px-3 bg-dark-950 rounded-3xl border-2 border-neutral-400 focus:border-neutral-300"
                 onClick={() =>
                   route(getReferenceEditPath(selectedReference?.reference))
                 }
@@ -388,7 +391,7 @@ export const Input = ({
               ref={refReferenceList}
               className={`${
                 !showReferenceList && "hidden"
-              } absolute top-full left-0 w-full z-30 bg-dark-925 p-2 max-w-[400px] max-h-[250px] overflow-y-auto`}
+              } absolute top-[calc(100%+8px)] left-0 w-full z-30 bg-dark-950 border-2 border-neutral-300 rounded-3xl p-2 max-w-[400px] max-h-[250px] overflow-y-auto hide-scrollbar`}
             >
               {referenceList.length === 0 && (
                 <p className="px-3 py-2 font-semibold">No hay elementos</p>
@@ -407,9 +410,7 @@ export const Input = ({
                   <button
                     key={i.id}
                     type="button"
-                    className={`px-3 py-2 w-full text-left transition-colors duration-200
-                      ${isSelected ? "bg-dark/30" : ""}
-                      ${isHighlighted ? "bg-dark/50" : ""}`}
+                    className={`px-3 py-2 w-full text-left transition-colors duration-200 first:rounded-t-2xl last:rounded-b-2xl ${isSelected ? "bg-dark-925/80" : ""} ${isHighlighted ? "bg-dark-925/80" : ""}`}
                     onMouseEnter={() => setHighlightIndex(idx)}
                     onClick={() => selectReference(i)}
                   >

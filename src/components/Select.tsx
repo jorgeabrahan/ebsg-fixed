@@ -9,6 +9,7 @@ export const Select = ({
   validationErrors,
   isDisabledByDefault,
   handleValueChange,
+  variant = "lg",
   ...props
 }: SelectField & {
   className?: string;
@@ -35,13 +36,13 @@ export const Select = ({
         className={`${className} ${applyDisabledStyle ? "opacity-50 cursor-not-allowed pointer-events-none" : ""} relative`}
       >
         <label
-          className="absolute -top-3 left-3 font-semibold bg-neutral-800 px-1.5 rounded-sm"
+          className="absolute -top-2 left-4 text-sm bg-dark-950 px-1.5 rounded-sm"
           htmlFor={props?.id}
         >
           {label}
         </label>
         <select
-          className="field-base"
+          className={`field-base field-base-${variant}`}
           {...props}
           value={props.value ?? ""}
           onChange={(e) => {

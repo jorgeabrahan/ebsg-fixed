@@ -18,6 +18,10 @@ export const PageStudents = () => {
             value: "created_at",
           },
           {
+            label: "Fecha de actualización",
+            value: "updated_at",
+          },
+          {
             label: "Código",
             value: "code",
           },
