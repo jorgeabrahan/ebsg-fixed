@@ -1,8 +1,15 @@
-export const IconList = ({ size = 24, strokeWidth = 1.5 }) => {
+import type { FunctionComponent } from "preact";
+import type { SVGAttributes } from "preact/compat";
+
+export const IconList: FunctionComponent<SVGAttributes<SVGSVGElement>> = ({
+  width = 24,
+  height = 24,
+  strokeWidth = 1.5,
+}) => {
   return (
     <svg
-      width={size}
-      height={size}
+      width={width}
+      height={height}
       stroke-width={strokeWidth}
       viewBox="0 0 24 24"
       fill="none"

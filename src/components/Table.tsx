@@ -216,7 +216,7 @@ export const Table = ({
                 onClick={() => onCreate()}
                 disabled={isLoading}
               >
-                <IconPlus size={22} strokeWidth={2} />
+                <IconPlus width={22} height={22} strokeWidth={2} />
                 <span>Nuevo</span>
               </PrimaryButton>
             )}

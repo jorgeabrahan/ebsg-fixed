@@ -16,6 +16,8 @@ import { useState } from "preact/hooks";
 import { IconXmark } from "../icons/IconXmark";
 import { IconLogOut } from "../icons/IconLogOut";
 import { IconBookSolid } from "../icons/IconBookSolid";
+import { IconList } from "../icons/IconList";
+import { IconPlus } from "../icons/IconPlusCircle";
 
 export function CSidebar() {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -53,43 +55,108 @@ export function CSidebar() {
         </a>
         <SidebarItems>
           <SidebarItemGroup>
-            <SidebarCollapse label="Estudiantes" icon={IconCommunity}>
-              <SidebarItem href={ROUTES.students.path}>Estudiantes</SidebarItem>
-              <SidebarItem href={ROUTES.studentsNew.path}>
+            <SidebarCollapse
+              className={"font-semibold"}
+              label="Estudiantes"
+              icon={() => IconCommunity({ strokeWidth: 2 })}
+              open
+            >
+              <SidebarItem
+                icon={() => IconList({ width: 17, height: 17 })}
+                href={ROUTES.students.path}
+              >
+                Ver todos
+              </SidebarItem>
+              <SidebarItem
+                icon={() => IconPlus({ width: 17, height: 17 })}
+                href={ROUTES.studentsNew.path}
+              >
                 Crear nuevo
               </SidebarItem>
             </SidebarCollapse>
-            <SidebarCollapse label="Contactos" icon={IconPhone}>
-              <SidebarItem href={ROUTES.contacts.path}>Contactos</SidebarItem>
-              <SidebarItem href={ROUTES.contactsNew.path}>
+            <SidebarCollapse
+              className={"font-semibold"}
+              label="Contactos"
+              icon={() => IconPhone({ strokeWidth: 2 })}
+              open
+            >
+              <SidebarItem
+                icon={() => IconList({ width: 17, height: 17 })}
+                href={ROUTES.contacts.path}
+              >
+                Ver todos
+              </SidebarItem>
+              <SidebarItem
+                icon={() => IconPlus({ width: 17, height: 17 })}
+                href={ROUTES.contactsNew.path}
+              >
                 Crear nuevo
               </SidebarItem>
             </SidebarCollapse>
-            <SidebarCollapse label="Años academicos" icon={IconCalendar}>
-              <SidebarItem href={ROUTES.academicYears.path}>
-                Años academicos
+            <SidebarCollapse
+              className={"font-semibold"}
+              label="Años academicos"
+              icon={() => IconCalendar({ strokeWidth: 2 })}
+              open
+            >
+              <SidebarItem
+                icon={() => IconList({ width: 17, height: 17 })}
+                href={ROUTES.academicYears.path}
+              >
+                Ver todos
               </SidebarItem>
-              <SidebarItem href={ROUTES.academicYearsNew.path}>
+              <SidebarItem
+                icon={() => IconPlus({ width: 17, height: 17 })}
+                href={ROUTES.academicYearsNew.path}
+              >
                 Crear nuevo
               </SidebarItem>
             </SidebarCollapse>
-            <SidebarCollapse label="Grados" icon={IconGraduationCap}>
-              <SidebarItem href={ROUTES.schoolGrades.path}>Grados</SidebarItem>
-              <SidebarItem href={ROUTES.schoolGradesNew.path}>
+            <SidebarCollapse
+              className={"font-semibold"}
+              label="Grados"
+              icon={() => IconGraduationCap({ strokeWidth: 2 })}
+              open
+            >
+              <SidebarItem
+                icon={() => IconList({ width: 17, height: 17 })}
+                href={ROUTES.schoolGrades.path}
+              >
+                Ver todos
+              </SidebarItem>
+              <SidebarItem
+                icon={() => IconPlus({ width: 17, height: 17 })}
+                href={ROUTES.schoolGradesNew.path}
+              >
                 Crear nuevo
               </SidebarItem>
             </SidebarCollapse>
-            <SidebarCollapse label="Tipos de pago" icon={IconLotOfCash}>
-              <SidebarItem href={ROUTES.financeFeeTypes.path}>
-                Tipos de pagos
+            <SidebarCollapse
+              className={"font-semibold"}
+              label="Tipos de pago"
+              icon={() => IconLotOfCash({ strokeWidth: 2 })}
+              open
+            >
+              <SidebarItem
+                icon={() => IconList({ width: 17, height: 17 })}
+                href={ROUTES.financeFeeTypes.path}
+              >
+                Ver todos
               </SidebarItem>
-              <SidebarItem href={ROUTES.financeFeeTypesNew.path}>
+              <SidebarItem
+                icon={() => IconPlus({ width: 17, height: 17 })}
+                href={ROUTES.financeFeeTypesNew.path}
+              >
                 Crear nuevo
               </SidebarItem>
             </SidebarCollapse>
           </SidebarItemGroup>
           <SidebarItemGroup>
-            <SidebarItem href="#" icon={IconLogOut}>
+            <SidebarItem
+              className={"font-semibold"}
+              href="#"
+              icon={() => IconLogOut({ strokeWidth: 2 })}
+            >
               Cerrar sesión
             </SidebarItem>
           </SidebarItemGroup>
