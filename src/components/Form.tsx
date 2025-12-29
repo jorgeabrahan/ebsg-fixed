@@ -52,13 +52,27 @@ export const Form = ({
   };
   const sanitizeFields = (entries: Record<string, any>) => {
     const sanitizedEntries: Record<string, any> = {};
-    fields.map((f) => {
-      if (f == null || typeof f?.name !== "string") return;
-      if (typeof f?.outputFormat === "function") {
-        sanitizedEntries[f.name] = f.outputFormat(entries[f.name]);
+
+    fields.forEach((f) => {
+      if (f == null || typeof f.name !== "string") return;
+
+      const value = entries[f.name];
+
+      if (typeof f.outputFormat === "function") {
+        sanitizedEntries[f.name] = f.outputFormat(value);
+        return;
       }
+
+      // { id, _meta } → id
+      if (value && typeof value === "object" && "id" in value) {
+        sanitizedEntries[f.name] = value.id;
+        return;
+      }
+
+      sanitizedEntries[f.name] = value;
     });
-    return { ...entries, ...sanitizedEntries };
+
+    return sanitizedEntries;
   };
   const validateFields = (
     sanitizedEntries: Record<string, any>,
@@ -99,16 +113,57 @@ export const Form = ({
     }
   };
 
-  const handleValueChange = (name: string, value: any) => {
-    setValues((v) => ({ ...v, [name]: value }));
+  const handleValueChange = (
+    name: string,
+    value: any,
+    meta?: Record<string, any>
+  ) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: meta
+        ? { id: value, _meta: meta }
+        : value,
+    }));
   };
+
+  const visibleFields = fields.filter((field) =>
+    typeof field.visibleWhen === "function" ? field.visibleWhen(values) : true
+  );
+
+  const isFieldVisible = (
+    field: FormDefinition["fields"][number],
+    values: Record<string, any>
+  ) => {
+    if (typeof field.visibleWhen !== "function") return true;
+    return field.visibleWhen(values);
+  };
+
+  useEffect(() => {
+    setValues((prev) => {
+      let changed = false;
+      const next = { ...prev };
+
+      fields.forEach((field) => {
+        if (!field.name) return;
+
+        const visible = isFieldVisible(field, prev);
+
+        if (!visible && prev[field.name] != null) {
+          next[field.name] = null;
+          changed = true;
+        }
+      });
+
+      return changed ? next : prev;
+    });
+  }, [values, fields]);
 
   return (
     <form
       className={`flex flex-col gap-6 pt-4 pb-8 ${className}`}
       onSubmit={onSubmitMiddleware}
     >
-      {fields.map((field) => {
+      {visibleFields.map((field) => {
         if (isSelectField(field)) {
           return (
             <Select
@@ -134,7 +189,9 @@ export const Form = ({
           <Input
             {...field}
             value={values[field.name]}
-            handleValueChange={(v) => handleValueChange(field.name, v)}
+            handleValueChange={(v, meta) =>
+              handleValueChange(field.name, v, meta)
+            }
             validationErrors={validationResults}
           />
         );

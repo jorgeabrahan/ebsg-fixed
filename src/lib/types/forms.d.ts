@@ -16,7 +16,8 @@ export type FieldSizeVariants = "md" | "lg";
 type BaseField = {
   label: string;
   id: string;
-  outputFormat?: (value: string) => any;
+  visibleWhen?: (values: Record<string, any>) => boolean;
+  outputFormat?: (value: any) => any;
   // sanitizedValue is the returned value from the outputFormat function
   // originalValue is the value before sanitization
   validation?: ({
@@ -86,4 +87,9 @@ export type FormDefinition = {
   }) => void;
   onCancel?: () => void;
   submitButton: ComponentChildren;
+};
+
+export type ReferenceValue<TMeta = any> = {
+  id: string;
+  _meta?: TMeta;
 };

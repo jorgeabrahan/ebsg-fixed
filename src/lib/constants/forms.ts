@@ -326,6 +326,12 @@ export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS: (
     required: true,
     orderColumn: "name",
     orderAscending: false,
+    visibleWhen: (values) => {
+      const periodicity = values.fee_type_id?._meta?.periodicity;
+      // Se oculta si aun no hay fee_type seleccionado
+      if (!periodicity) return false;
+      return periodicity !== "once-per-year";
+    }
   },
   {
     label: "Monto",
