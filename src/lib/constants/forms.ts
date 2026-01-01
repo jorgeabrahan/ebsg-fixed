@@ -335,25 +335,30 @@ export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS: (
   },
   {
     label: "Inicio del periodo mensual",
-    id: "monthly_start_date",
-    name: "monthly_start_date",
+    id: "start_date",
+    name: "start_date",
     type: "date",
+    required: true, 
+    validation: UtilFieldValidator.date,
     visibleWhen: (values) => {
       const periodicity = values.fee_type_id?._meta?.periodicity;
       return periodicity === "monthly";
     },
-    required: true,
   },
   {
     label: "Fin del periodo mensual",
-    id: "monthly_end_date",
-    name: "monthly_end_date",
+    id: "end_date",
+    name: "end_date",
     type: "date",
+    required: true,
+    validation: UtilFieldValidator.compose(
+      UtilFieldValidator.date,
+      UtilFieldValidator.endDateAfterStart,
+    ),
     visibleWhen: (values) => {
       const periodicity = values.fee_type_id?._meta?.periodicity;
       return periodicity === "monthly";
     },
-    required: true,
   },
   {
     label: "Monto",
