@@ -81,6 +81,10 @@ export const Form = ({
     const tempValidationResults = fields.map((f) => {
       const inputName = typeof f.name === "string" ? f.name : String(f.name);
 
+      if (!isFieldVisible(f, originalEntries)) {
+        return { inputName, isSuccess: true };
+      }
+
       if (typeof f?.validation === "function") {
         return {
           inputName,
