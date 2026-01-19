@@ -14,6 +14,12 @@ export const COLUMN_FORMATS = {
   date: "date",
 } as const;
 
+export const formatCurrencyHNL = (value: number) =>
+  new Intl.NumberFormat("es-HN", {
+    style: "currency",
+    currency: "HNL",
+  }).format(value);
+
 export const MORE_ACTIONS = {
   delete: {
     id: "delete",
@@ -220,5 +226,42 @@ export const FINANCE_FEE_TYPES_TABLE_COLUMNS: Column[] = [
     label: "Periodicidad",
     calculatedValue: (i) =>
       UtilLookup.getLabelFromValue(PERIODICITY_LOOKUP, i.periodicity),
+  },
+];
+
+export const FINANCE_CHARGES_TABLE_COLUMNS: Column[] = [
+  {
+    id: "fee_type",
+    label: "Concepto",
+    calculatedValue: (i) => i?.finance_fee_types?.name,
+  },
+  {
+    id: "description",
+    label: "Descripción",
+  },
+  {
+    id: "period_month",
+    label: "Periodo",
+    calculatedValue: (i) =>
+      i?.period_month
+        ? new Date(i.period_month).toLocaleDateString("es-HN", {
+            year: "numeric",
+            month: "long",
+          })
+        : "—",
+  },
+    {
+    id: "amount_due",
+    label: "Monto",
+    calculatedValue: (i) => formatCurrencyHNL(Number(i.amount_due)),
+  },
+  {
+    id: "due_date",
+    label: "Vence",
+    format: "date",
+  },
+  {
+    id: "status",
+    label: "Estado",
   },
 ];
