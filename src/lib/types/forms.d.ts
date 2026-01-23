@@ -17,6 +17,7 @@ type BaseField = {
   label: string;
   id: string;
   visibleWhen?: (values: Record<string, any>) => boolean;
+  requiredWhen?: boolean | ((values: Record<string, any>) => boolean);
   outputFormat?: (value: any) => any;
   // sanitizedValue is the returned value from the outputFormat function
   // originalValue is the value before sanitization
@@ -66,6 +67,7 @@ type TextAreaHTMLProps = Omit<ComponentProps<"textarea">, "id" | "className">;
 export type TextAreaField = BaseField &
   TextAreaHTMLProps & {
     name: string;
+    type: "textArea";
     required?: boolean;
     rows: number;
   };
@@ -74,12 +76,13 @@ type SelectHTMLProps = Omit<ComponentProps<"select">, "id" | "className">;
 export type SelectField = BaseField &
   SelectHTMLProps & {
     name: string;
+    type: "select";
     defaultValue?: string;
     options: readonly { label: string; value: string }[];
   };
 
 export type FormDefinition = {
-  fields: (TextField | SelectField | TextAreaField)[];
+  fields: (TextField | SelectField | TextAreaField | RepeatableField )[];
   onSubmit: (params: {
     e: TargetedSubmitEvent<HTMLFormElement>;
     originalEntries: Record<string, string | File>;
@@ -92,4 +95,20 @@ export type FormDefinition = {
 export type ReferenceValue<TMeta = any> = {
   id: string;
   _meta?: TMeta;
+};
+
+export type ArrayFieldType =
+  | { type: "date" }
+  | { type: "text" }
+  | {
+      type: "select";
+      options: readonly { label: string; value: string }[];
+    };
+
+export type ArrayField = BaseField & {
+  name: string;
+  type: "array";
+  of: ArrayFieldType;
+  required?: boolean;
+  minItems?: number;
 };

@@ -2,6 +2,7 @@ import type {
   FormDefinition,
   SelectField,
   TextAreaField,
+   ArrayField,
 } from "../types/forms";
 
 export function isSelectField(
@@ -12,6 +13,7 @@ export function isSelectField(
     Array.isArray((field as SelectField).options)
   );
 }
+
 export function isTextAreaField(
   field: FormDefinition["fields"][number],
 ): field is TextAreaField {
@@ -19,4 +21,10 @@ export function isTextAreaField(
     (field as TextAreaField).rows !== undefined &&
     typeof (field as TextAreaField).rows === "number"
   );
+}
+
+export function isArrayField(
+  field: FormDefinition["fields"][number],
+): field is ArrayField {
+  return field.type === "array";
 }

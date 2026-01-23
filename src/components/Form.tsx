@@ -2,10 +2,12 @@ import type { FormDefinition } from "../lib/types/forms";
 import { Input } from "./Input";
 import { PrimaryButton } from "./PrimaryButton";
 import { Select } from "./Select";
-import { isSelectField, isTextAreaField } from "../lib/typeGuards/forms";
+import { isSelectField, isTextAreaField,  isArrayField, } from "../lib/typeGuards/forms";
 import type { TargetedSubmitEvent } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { TextArea } from "./TextArea";
+import {  ArrayFieldRenderer } from "./Array";
+
 
 export const Form = ({
   fields,
@@ -17,14 +19,16 @@ export const Form = ({
 }: FormDefinition & { className?: string; isDisabled?: boolean }) => {
   const buildInitialValues = (fields: FormDefinition["fields"]) => {
     const obj: Record<string, any> = {};
-
+    
     fields.forEach((f) => {
-      if (!isSelectField(f) && !isTextAreaField(f) && f?.type === "checkbox") {
-        obj[f.name] = Boolean(f.value);
+      const fieldValue = "value" in f ? f.value : undefined;
+
+      if (!isSelectField(f) && !isTextAreaField(f) && f.type === "checkbox") {
+        obj[f.name] = Boolean(fieldValue);
         return;
       }
 
-      obj[f.name] = f.value ?? "";
+      obj[f.name] = fieldValue ?? "";
     });
 
     return obj;
@@ -168,6 +172,17 @@ export const Form = ({
       onSubmit={onSubmitMiddleware}
     >
       {visibleFields.map((field) => {
+        if (isArrayField(field)) {
+          return (
+            <ArrayFieldRenderer
+              field={field}
+              value={values[field.name]}
+              onChange={(v) => handleValueChange(field.name, v)}
+              disabled={isDisabled || field.isDisabledByDefault}
+            />
+          );
+        }
+
         if (isSelectField(field)) {
           return (
             <Select
