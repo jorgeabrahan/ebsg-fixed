@@ -22,7 +22,7 @@ export const PageAcademicYearFinanceFeeSchedule = ({
             ? ROUTES.academicYear.build(academicYearId)
             : ROUTES.academicYears.path
         }
-        submitLabel="Editar contacto"
+        submitLabel="Editar política"
       />
     </WrapperDelimiter>
   );

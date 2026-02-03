@@ -378,25 +378,32 @@ export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS: (
     validation: UtilFieldValidator.amount,
   },
   {
-  label: "Fechas de cargos",
-  id: "occurrences",
-  name: "occurrences",
-  type: "array",
-  of: { type: "date" },
+    label: "Fechas de cargos",
+    id: "occurrences",
+    name: "occurrences",
+    type: "array",
+    of: { type: "date" },
 
-  requiredWhen: (values) => {
-    const periodicity = values.fee_type_id?._meta?.periodicity;
-    return periodicity === "adhoc";
+    requiredWhen: (values) => {
+      const periodicity = values.fee_type_id?._meta?.periodicity;
+      return periodicity === "adhoc";
+    },
+
+    visibleWhen: (values) => {
+      const periodicity = values.fee_type_id?._meta?.periodicity;
+      return periodicity === "adhoc";
+    },
+    validation: UtilFieldValidator.compose(
+      UtilFieldValidator.arrayOf(
+        (params) => UtilFieldValidator.date(params),
+        {
+          required: true,
+          minItems: 1,
+        },
+      ),
+      UtilFieldValidator.uniqueValues(),
+    ),
   },
-
-  visibleWhen: (values) => {
-    const periodicity = values.fee_type_id?._meta?.periodicity;
-    return periodicity === "adhoc";
-  },
-
-  minItems: 1,
-},
-
 ];
 
 export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_EDIT_FIELDS: (

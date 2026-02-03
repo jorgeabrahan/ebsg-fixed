@@ -271,4 +271,84 @@ export class UtilFieldValidator {
       return { isSuccess: true };
     };
   }
+
+  static arrayOf(
+    itemValidator: (
+      params: FieldValidationParameters,
+      index: number,
+    ) => { isSuccess: boolean; error?: string },
+    config?: {
+      required?: boolean;
+      minItems?: number;
+    },
+  ) {
+    return ({ sanitizedValue, sanitizedEntries }: FieldValidationParameters) => {
+      const required = config?.required ?? false;
+      const minItems = config?.minItems;
+
+      if (!Array.isArray(sanitizedValue)) {
+        return {
+          isSuccess: !required,
+          error: required ? "El campo es obligatorio" : "",
+        };
+      }
+
+      if (required && sanitizedValue.length === 0) {
+        return {
+          isSuccess: false,
+          error: "Debe agregar al menos un elemento",
+        };
+      }
+
+      if (
+        minItems !== undefined &&
+        sanitizedValue.length < minItems
+      ) {
+        return {
+          isSuccess: false,
+          error: `Debe agregar al menos ${minItems} elementos`,
+        };
+      }
+
+      for (let i = 0; i < sanitizedValue.length; i++) {
+        const result = itemValidator(
+          {
+            sanitizedValue: sanitizedValue[i],
+            sanitizedEntries,
+          } as FieldValidationParameters,
+          i,
+        );
+
+        if (!result.isSuccess) {
+          return {
+            isSuccess: false,
+            error: `Elemento #${i + 1}: ${result.error}`,
+          };
+        }
+      }
+
+      return { isSuccess: true };
+    };
+  }
+
+  static uniqueValues(
+    config?: { message?: string },
+  ) {
+    return ({ sanitizedValue }: FieldValidationParameters) => {
+      if (!Array.isArray(sanitizedValue)) return { isSuccess: true };
+
+      const set = new Set(
+        sanitizedValue.filter(v => v !== null && v !== undefined && v !== ""),
+      );
+
+      if (set.size !== sanitizedValue.length) {
+        return {
+          isSuccess: false,
+          error: config?.message ?? "No se permiten valores duplicados",
+        };
+      }
+
+      return { isSuccess: true };
+    };
+  }
 }
