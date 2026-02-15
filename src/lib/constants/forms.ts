@@ -406,17 +406,13 @@ export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS: (
   },
 ];
 
-export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_EDIT_FIELDS: (
-  | TextField
-  | SelectField
-  | ArrayField
-)[] = ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS.map((f) => {
-  if (f.id === "amount") return f;
-  return {
-    ...f,
-    isDisabledByDefault: true,
-  };
-});
+export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_EDIT_FIELDS =
+  ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS
+    .filter((f) => f.id !== "occurrences")
+    .map((f) => {
+      if (f.id === "amount") return f;
+      return { ...f, isDisabledByDefault: true };
+    });
 
 export const FINANCE_FEE_TYPES_BASE_FIELDS: (
   | TextField
