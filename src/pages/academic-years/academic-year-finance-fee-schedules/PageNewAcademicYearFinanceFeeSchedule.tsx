@@ -29,7 +29,7 @@ export const PageNewAcademicYearFinanceFeeSchedule = ({
       "finance_fee_schedule_occurrences",
       occurrences.map((date) => ({
         schedule_id: createdSchedule.id,
-        charge_date: date,
+        due_date: date,
       })),
     );
   };
