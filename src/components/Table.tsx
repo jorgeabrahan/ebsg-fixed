@@ -48,11 +48,12 @@ export const Table = ({
   title,
   columns = [],
   items = [],
-  isSelectable = true,
+  isSelectable = false,
   isDeletable = true,
   onCreate,
   onEdit,
   onReload,
+  onSelectionChange,
 }: {
   table: PublicTable;
   title?: string;
@@ -63,6 +64,7 @@ export const Table = ({
   onCreate?: () => any;
   onEdit?: (id: string) => any;
   onReload: () => Promise<void>;
+  onSelectionChange?: (ids: string[], items: Record<string, any>[]) => void;
 }) => {
   const refContextMenu = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -204,6 +206,15 @@ export const Table = ({
       window.removeEventListener("click", handleClickOutside);
     };
   }, [contextMenu]);
+  useEffect(() => {
+    if (!onSelectionChange) return;
+
+    const selectedFullItems = items.filter((item) =>
+      selectedItems.includes(item.id)
+    );
+
+    onSelectionChange(selectedItems, selectedFullItems);
+  }, [selectedItems]);
   return (
     <>
       <section>

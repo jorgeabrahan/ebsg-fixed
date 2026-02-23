@@ -265,3 +265,32 @@ export const FINANCE_CHARGES_TABLE_COLUMNS: Column[] = [
     label: "Estado",
   },
 ];
+
+export const FINANCE_TRANSACTIONS_TABLE_COLUMNS: Column[] = [
+  {
+    id: "payment_date",
+    label:  "Fecha",
+  },
+  {
+    id: "method",
+    label: "Método",
+  },
+  {
+    id: "reference",
+    label: "Referencia",
+  },
+  {    
+    id: "amount_total",
+    label: "Total",
+    calculatedValue: (i) => formatCurrencyHNL(Number(i.amount_total)),
+  },
+  {
+    id: "notes",
+    label: "Notas",
+  },
+  {
+    id: "created_at",
+    label: "Creado",
+  },
+];
+
