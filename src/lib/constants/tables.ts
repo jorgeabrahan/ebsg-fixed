@@ -7,6 +7,8 @@ import {
   PERIODICITY_LOOKUP,
   SCHOOL_ENROLLMENT_STATUS_LOOKUP,
   STUDENT_CONTANT_RELATION_TYPE_LOOKUP,
+  FINANCE_CHARGE_STATUS_LOOKUP,
+  PAYMENT_METHOD_LOOKUP
 } from "./lookups";
 
 export const COLUMN_FORMATS = {
@@ -250,10 +252,23 @@ export const FINANCE_CHARGES_TABLE_COLUMNS: Column[] = [
           })
         : "—",
   },
-    {
+  {
     id: "amount_due",
     label: "Monto",
-    calculatedValue: (i) => formatCurrencyHNL(Number(i.amount_due)),
+    calculatedValue: (i) =>
+      formatCurrencyHNL(Number(i.amount_due ?? 0)),
+  },
+  {
+    id: "amount_paid",
+    label: "Pagado",
+    calculatedValue: (i) =>
+      formatCurrencyHNL(Number(i.amount_paid ?? 0)),
+  },
+  {
+    id: "balance_due",
+    label: "Saldo",
+      calculatedValue: (i) =>
+      formatCurrencyHNL(Number(i.balance_due ?? 0)),
   },
   {
     id: "due_date",
@@ -263,17 +278,33 @@ export const FINANCE_CHARGES_TABLE_COLUMNS: Column[] = [
   {
     id: "status",
     label: "Estado",
+    calculatedValue: (i) =>
+      UtilLookup.getLabelFromValue(
+        FINANCE_CHARGE_STATUS_LOOKUP,
+        i.status,
+      ),
   },
 ];
 
 export const FINANCE_TRANSACTIONS_TABLE_COLUMNS: Column[] = [
   {
+    id: "charges",
+    label: "Cargos",
+    calculatedValue: (row) =>
+      row.finance_transaction_allocations
+        ?.map((a: any) => a.finance_charges?.description)
+        .filter(Boolean)
+        .join(", ") || "—",
+  },
+  {
     id: "payment_date",
-    label:  "Fecha",
+    label:  "Fecha Pago",
   },
   {
     id: "method",
     label: "Método",
+    calculatedValue: (i) =>
+    UtilLookup.getLabelFromValue(PAYMENT_METHOD_LOOKUP, i.method),
   },
   {
     id: "reference",
@@ -287,10 +318,6 @@ export const FINANCE_TRANSACTIONS_TABLE_COLUMNS: Column[] = [
   {
     id: "notes",
     label: "Notas",
-  },
-  {
-    id: "created_at",
-    label: "Creado",
   },
 ];
 

@@ -3,6 +3,7 @@ import { signal } from "@preact/signals";
 export type Charge = {
   id: number;
   amount_due: number;
+  description: string;
 };
 
 type PaymentModalOptions = {

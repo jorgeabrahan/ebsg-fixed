@@ -30,6 +30,8 @@ export const PageAcademicYear = ({
               isDefault: true,
               content: (
                 <ResourceList
+                  title="Políticas financieras"
+                  hideTitle
                   table="finance_fee_schedules"
                   columns={ACADEMIC_YEAR_FINANCE_FEE_SCHEDULES_TABLE_COLUMNS}
                   select="*, school_grades(name), finance_fee_types(name, periodicity)"

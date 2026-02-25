@@ -22,6 +22,8 @@ export default function ResourceList<K extends PublicTable>({
   sortableColumns = [],
   selectionEnabled = false,
   onSelectionChange,
+  headerActions,
+  hideTitle = false
 }: {
   table: K;
   columns: Column[];
@@ -38,6 +40,8 @@ export default function ResourceList<K extends PublicTable>({
   sortableColumns?: { value: string; label: string }[];
   selectionEnabled?: boolean;
   onSelectionChange?: (ids: string[], items: Record<string, any>[]) => void;
+  headerActions?: preact.ComponentChildren;
+  hideTitle?: boolean;
 }) {
   const [items, setItems] = useState<Tables<K>[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -120,6 +124,8 @@ export default function ResourceList<K extends PublicTable>({
 
       <Table
         title={title}
+        hideTitle={hideTitle}
+        headerActions={headerActions}
         table={table}
         columns={columns}
         items={items}

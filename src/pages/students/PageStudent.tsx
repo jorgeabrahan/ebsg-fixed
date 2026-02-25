@@ -30,6 +30,8 @@ export const PageStudent = ({ studentId }: { studentId?: string }) => {
               isDefault: true,
               content: (
                 <ResourceList
+                  title="Contactos"
+                  hideTitle
                   table="person_student_contacts"
                   columns={STUDENT_CONTACT_TABLE_COLUMNS}
                   select="*, person_contacts(*)"
@@ -48,11 +50,13 @@ export const PageStudent = ({ studentId }: { studentId?: string }) => {
               ),
             },
             {
-              label: "Matriculas",
+              label: "Matrículas",
               id: "enrollments",
               isDefault: true,
               content: (
                 <ResourceList
+                  title="Matrículas"
+                  hideTitle
                   table="school_enrollments"
                   columns={STUDENT_SCHOOL_ENROLLMENTS_TABLE_COLUMNS}
                   select="*, school_academic_years(year_label), school_grades(name)"

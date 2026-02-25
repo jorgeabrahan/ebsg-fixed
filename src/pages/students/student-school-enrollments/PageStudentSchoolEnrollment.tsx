@@ -4,7 +4,10 @@ import { ROUTES } from "../../../lib/constants/routes";
 import { WrapperDelimiter } from "../../../wrappers/WrapperDelimiter";
 import { CTabs } from "../../../components/CTabs";
 import ResourceList from "../../../components/ResourceList";
-import { FINANCE_CHARGES_TABLE_COLUMNS, FINANCE_TRANSACTIONS_TABLE_COLUMNS } from "../../../lib/constants/tables";
+import {
+  FINANCE_CHARGES_TABLE_COLUMNS,
+  FINANCE_TRANSACTIONS_TABLE_COLUMNS,
+} from "../../../lib/constants/tables";
 import { useState } from "preact/hooks";
 
 import {
@@ -13,6 +16,12 @@ import {
 } from "../../../stores/paymentModal";
 import { PrimaryButton } from "../../../components/PrimaryButton";
 
+import type { Database } from "../../../lib/types/database.types";
+import type { Charge } from "../../../stores/paymentModal";
+
+type FinanceChargeWithBalance =
+  Database["public"]["Views"]["finance_charges_with_balance"]["Row"];
+
 export const PageStudentSchoolEnrollment = ({
   studentId,
   schoolEnrollmentId,
@@ -20,7 +29,8 @@ export const PageStudentSchoolEnrollment = ({
   studentId?: string;
   schoolEnrollmentId?: string;
 }) => {
-  const [selectedCharges, setSelectedCharges] = useState<any[]>([]);
+  const [selectedCharges, setSelectedCharges] =
+    useState<FinanceChargeWithBalance[]>([]);
 
   return (
     <WrapperDelimiter>
@@ -30,9 +40,11 @@ export const PageStudentSchoolEnrollment = ({
         select="*, person_students(id, first_name, last_name), school_academic_years(id, year_label), school_grades(id, name)"
         fields={STUDENT_SCHOOL_ENROLLMENT_BASE_FIELDS}
         redirectTo={
-          studentId ? ROUTES.student.build(studentId) : ROUTES.students.path
+          studentId
+            ? ROUTES.student.build(studentId)
+            : ROUTES.students.path
         }
-        submitLabel="Editar matricula"
+        submitLabel="Editar matrícula"
       />
 
       {schoolEnrollmentId && (
@@ -45,38 +57,42 @@ export const PageStudentSchoolEnrollment = ({
               isDefault: true,
               content: (
                 <>
-                  <header className="flex items-center justify-between gap-2 pb-3">
-                    <h2 className="text-3xl font-bold"></h2>
-
-                    <PrimaryButton
-                      size="lg"
-                      disabled={
-                        selectedCharges.length === 0 || !studentId
-                      }
-                      onClick={() => {
-                        if (!studentId) return;
-
-                        paymentModalOptions.value = {
-                          studentId: Number(studentId), 
-                          charges: selectedCharges.map((c) => ({
-                            id: c.id,
-                            amount_due: Number(c.amount_due),
-                          })),
-                          onSuccess: () => {
-                            setSelectedCharges([]);
-                            // aquí puedes disparar reload si tu ResourceList lo soporta
-                          },
-                        };
-
-                        isShowingPaymentModal.value = true;
-                      }}
-                    >
-                      Crear pago
-                    </PrimaryButton>
-                  </header>
-
                   <ResourceList
-                    table="finance_charges"
+                    title="Cargos Financieros"
+                    hideTitle
+                    headerActions={
+                      <PrimaryButton
+                        size="lg"
+                        className="ml-auto"
+                        disabled={
+                          selectedCharges.length === 0 || !studentId
+                        }
+                        onClick={() => {
+                          if (!studentId) return;
+
+                          const adaptedCharges: Charge[] = selectedCharges
+                            .filter((c) => c.id !== null)
+                            .map((c) => ({
+                              id: c.id as number,
+                              amount_due: Number(c.balance_due ?? 0),
+                              description: c.description as string
+                            }));
+
+                          paymentModalOptions.value = {
+                            studentId: Number(studentId),
+                            charges: adaptedCharges,
+                            onSuccess: () => {
+                              setSelectedCharges([]);
+                            },
+                          };
+
+                          isShowingPaymentModal.value = true;
+                        }}
+                      >
+                        Crear pago
+                      </PrimaryButton>
+                    }
+                    table="finance_charges_with_balance"
                     columns={FINANCE_CHARGES_TABLE_COLUMNS}
                     select={`
                       *,
@@ -88,40 +104,57 @@ export const PageStudentSchoolEnrollment = ({
                         operator: "eq",
                         value: schoolEnrollmentId,
                       },
+                      {
+                        column: "status",
+                        operator: "in",
+                        value: ["open", "partially_paid"],
+                      },
                     ]}
                     selectionEnabled
                     onSelectionChange={(_, items) =>
-                      setSelectedCharges(items)
+                      setSelectedCharges(
+                        items as FinanceChargeWithBalance[]
+                      )
                     }
                   />
                 </>
               ),
             },
-            {
-              label: "Pagos",
-              id: "payments",
-              content: (
-                <ResourceList
-                  table="finance_transactions"
-                  columns={FINANCE_TRANSACTIONS_TABLE_COLUMNS}
-                  select={`
-                    *,
-                    finance_transaction_allocations(
-                      amount_applied,
-                      finance_charges(enrollment_id)
-                    )
-                  `}
-                  where={[
-                    {
-                      column:
-                        "finance_transaction_allocations.finance_charges.enrollment_id",
-                      operator: "eq",
-                      value: schoolEnrollmentId,
-                    },
-                  ]}
-                />
-              ),
-            },
+
+            ...(studentId
+              ? [
+                  {
+                    label: "Pagos",
+                    id: "payments",
+                    content: (
+                      <ResourceList
+                        title="Pagos Financieros"
+                        hideTitle
+                        table="finance_transactions"
+                        columns={FINANCE_TRANSACTIONS_TABLE_COLUMNS}
+                        select={`
+                          *,
+                          finance_transaction_allocations(
+                            amount_applied,
+                            finance_charges(
+                              id,
+                              description,
+                              period_month
+                            )
+                          )
+                        `}
+                        where={[
+                          {
+                            column: "student_id",
+                            operator: "eq",
+                            value: studentId,
+                          },
+                        ]}
+                      />
+                    ),
+                  },
+                ]
+              : []),
           ]}
         />
       )}

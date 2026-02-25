@@ -7,8 +7,8 @@ export const PageAcademicYearFinanceFeeSchedule = ({
   academicYearId,
   financeFeeScheduleId,
 }: {
-  academicYearId: string;
-  financeFeeScheduleId: string;
+  academicYearId?: string;
+  financeFeeScheduleId?: string;
 }) => {
   const onBeforeUpdate = (entries: Record<string, any>) => {
     const { occurrences, ...schedule } = entries;

@@ -2,7 +2,7 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from "flowbite-react";
 import { isShowingPaymentModal, paymentModalOptions } from "../stores/paymentModal";
 import { PrimaryButton } from "./PrimaryButton";
 import { useState, useMemo } from "preact/hooks";
-import { supabase } from '../config/supabase';
+import { supabase } from "../config/supabase";
 
 export function PaymentModal() {
   const charges = paymentModalOptions.value.charges || [];
@@ -14,26 +14,26 @@ export function PaymentModal() {
 
   const [loading, setLoading] = useState(false);
 
-  // Total pendiente
-  const total = useMemo(
-    () =>
-      charges.reduce((sum, c) => sum + Number(c.amount_due || 0), 0),
-    [charges]
-  );
+  const total = useMemo(() => {
+    return charges.reduce(
+      (sum, c) => sum + Number(c.amount_due ?? 0),
+      0
+    );
+  }, [charges]);
 
-  // Total ingresado
-  const enteredTotal = useMemo(
-    () =>
-      payments.reduce((sum, p) => sum + Number(p.amount || 0), 0),
-    [payments]
-  );
+  const enteredTotal = useMemo(() => {
+    return payments.reduce(
+      (sum, p) => sum + Number(p.amount ?? 0),
+      0
+    );
+  }, [payments]);
 
   const remaining = total - enteredTotal;
 
   const isValid =
     enteredTotal > 0 &&
     enteredTotal <= total &&
-    payments.every((p) => p.amount > 0);
+    payments.every((p) => Number(p.amount) > 0);
 
   function updatePayment(index: number, field: string, value: any) {
     const copy = [...payments];
@@ -53,54 +53,55 @@ export function PaymentModal() {
   }
 
   async function handleConfirm() {
-    if (!isValid) return;
+    if (!isValid || !studentId) return;
 
     setLoading(true);
 
     try {
       for (const p of payments) {
-        // 1️⃣ Crear transaction
-        const { data: transaction, error } = await supabase
-          .from("finance_transactions")
-          .insert({
-            student_id: studentId,
-            amount_total: p.amount,
-            method: p.method,
-            reference: p.reference || null,
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-
-        // 2️⃣ Distribuir allocations automáticamente
-        let remainingToApply = p.amount;
+        let remainingToApply = Number(p.amount);
+        const allocations: { charge_id: number; amount: number }[] = [];
 
         for (const charge of charges) {
           if (remainingToApply <= 0) break;
 
-          const chargeDue = Number(charge.amount_due);
+          const chargeDue = Number(charge.amount_due ?? 0);
+          if (chargeDue <= 0) continue;
 
-          const amountApplied = Math.min(chargeDue, remainingToApply);
+          const amountApplied = Math.min(
+            chargeDue,
+            remainingToApply
+          );
 
-          if (amountApplied > 0) {
-            const { error: allocError } = await supabase
-              .from("finance_transaction_allocations")
-              .insert({
-                transaction_id: transaction.id,
-                charge_id: charge.id,
-                amount_applied: amountApplied,
-              });
+          allocations.push({
+            charge_id: charge.id,
+            amount: amountApplied,
+          });
 
-            if (allocError) throw allocError;
-
-            remainingToApply -= amountApplied;
-          }
+          remainingToApply -= amountApplied;
         }
+
+        const { error } = await supabase.rpc(
+          "create_finance_payment",
+          {
+            p_student_id: studentId,
+            p_payment_date: new Date()
+              .toISOString()
+              .slice(0, 10),
+            p_method: p.method,
+            p_reference: p.reference || null,
+            p_amount_total: p.amount,
+            p_notes: null,
+            p_allocations: allocations,
+          }
+        );
+
+        if (error) throw error;
       }
 
       isShowingPaymentModal.value = false;
       paymentModalOptions.value.onSuccess?.();
+
     } catch (err) {
       console.error(err);
       alert("Error al registrar el pago");
@@ -117,8 +118,28 @@ export function PaymentModal() {
       <ModalHeader>Crear pago</ModalHeader>
 
       <ModalBody>
-        <p>Cargos seleccionados: {charges.length}</p>
-        <p>Total pendiente: {total.toFixed(2)}</p>
+        <p class="font-semibold">
+          Cargos seleccionados: {charges.length}
+        </p>
+
+        <p class="font-semibold mt-2">
+          Total pendiente: L {total.toFixed(2)}
+        </p>
+
+        {/* Detalle de cargos */}
+        <div class="mt-3 space-y-2">
+          {charges.map((c) => (
+            <div
+              key={c.id}
+              class="flex justify-between text-sm border-b pb-1"
+            >
+              <span>{c.description}</span>
+              <span class="font-semibold">
+                L {Number(c.amount_due ?? 0).toFixed(2)}
+              </span>
+            </div>
+          ))}
+        </div>
 
         <div class="mt-4">
           {payments.map((p, index) => (
@@ -143,8 +164,14 @@ export function PaymentModal() {
                 <input
                   type="number"
                   value={p.amount}
+                  min="0"
+                  max={total}
                   onInput={(e: any) =>
-                    updatePayment(index, "amount", Number(e.target.value))
+                    updatePayment(
+                      index,
+                      "amount",
+                      Number(e.target.value)
+                    )
                   }
                   class="w-full border rounded px-2 py-1"
                 />
@@ -152,11 +179,17 @@ export function PaymentModal() {
 
               {p.method === "transfer" && (
                 <div class="mb-2">
-                  <label class="block text-sm">Referencia</label>
+                  <label class="block text-sm">
+                    Referencia
+                  </label>
                   <input
                     value={p.reference}
                     onInput={(e: any) =>
-                      updatePayment(index, "reference", e.target.value)
+                      updatePayment(
+                        index,
+                        "reference",
+                        e.target.value
+                      )
                     }
                     class="w-full border rounded px-2 py-1"
                   />
@@ -177,7 +210,7 @@ export function PaymentModal() {
 
           <button
             type="button"
-            class="text-blue-600 text-sm"
+            class="text-blue-500 text-sm"
             onClick={addPayment}
           >
             + Agregar método
@@ -185,15 +218,18 @@ export function PaymentModal() {
         </div>
 
         <div class="mt-4">
-          <p>Total ingresado: {enteredTotal.toFixed(2)}</p>
+          <p>Total ingresado: L {enteredTotal.toFixed(2)}</p>
+
           <p
             class={
               remaining === 0
-                ? "text-green-600"
-                : "text-red-600"
+                ? "text-green-500 font-semibold"
+                : remaining > 0
+                ? "text-red-500 font-semibold"
+                : "text-yellow-500 font-semibold"
             }
           >
-            Restante por asignar: {remaining.toFixed(2)}
+            Restante por asignar: L {remaining.toFixed(2)}
           </p>
         </div>
       </ModalBody>
@@ -208,7 +244,9 @@ export function PaymentModal() {
 
         <PrimaryButton
           variant="muted"
-          onClick={() => (isShowingPaymentModal.value = false)}
+          onClick={() =>
+            (isShowingPaymentModal.value = false)
+          }
         >
           Cancelar
         </PrimaryButton>

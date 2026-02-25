@@ -54,6 +54,8 @@ export const Table = ({
   onEdit,
   onReload,
   onSelectionChange,
+  headerActions,
+  hideTitle = false
 }: {
   table: PublicTable;
   title?: string;
@@ -65,6 +67,8 @@ export const Table = ({
   onEdit?: (id: string) => any;
   onReload: () => Promise<void>;
   onSelectionChange?: (ids: string[], items: Record<string, any>[]) => void;
+  headerActions?: ComponentChildren;
+  hideTitle?: boolean;
 }) => {
   const refContextMenu = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -220,12 +224,22 @@ export const Table = ({
       <section>
         {((title != null && title.length > 0) || isCreatable) && (
           <header className={"flex items-center justify-between gap-2 pb-3"}>
-            <h2 className="text-3xl font-bold">{title}</h2>
+            <h2
+              className={
+                hideTitle
+                  ? "sr-only"
+                  : "text-3xl font-bold"
+              }
+            >
+              {title}
+            </h2>
+            {headerActions}
             {isCreatable && (
               <PrimaryButton
                 size="lg"
                 onClick={() => onCreate()}
                 disabled={isLoading}
+                className="ml-auto"
               >
                 <IconPlus width={22} height={22} strokeWidth={2} />
                 <span>Nuevo</span>
