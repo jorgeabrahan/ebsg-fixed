@@ -7,12 +7,20 @@ import {
   PERIODICITY_LOOKUP,
   SCHOOL_ENROLLMENT_STATUS_LOOKUP,
   STUDENT_CONTANT_RELATION_TYPE_LOOKUP,
+  FINANCE_CHARGE_STATUS_LOOKUP,
+  PAYMENT_METHOD_LOOKUP
 } from "./lookups";
 
 export const COLUMN_FORMATS = {
   text: "text",
   date: "date",
 } as const;
+
+export const formatCurrencyHNL = (value: number) =>
+  new Intl.NumberFormat("es-HN", {
+    style: "currency",
+    currency: "HNL",
+  }).format(value);
 
 export const MORE_ACTIONS = {
   delete: {
@@ -222,3 +230,94 @@ export const FINANCE_FEE_TYPES_TABLE_COLUMNS: Column[] = [
       UtilLookup.getLabelFromValue(PERIODICITY_LOOKUP, i.periodicity),
   },
 ];
+
+export const FINANCE_CHARGES_TABLE_COLUMNS: Column[] = [
+  {
+    id: "fee_type",
+    label: "Concepto",
+    calculatedValue: (i) => i?.finance_fee_types?.name,
+  },
+  {
+    id: "description",
+    label: "Descripción",
+  },
+  {
+    id: "period_month",
+    label: "Periodo",
+    calculatedValue: (i) =>
+      i?.period_month
+        ? new Date(i.period_month).toLocaleDateString("es-HN", {
+            year: "numeric",
+            month: "long",
+          })
+        : "—",
+  },
+  {
+    id: "amount_due",
+    label: "Monto",
+    calculatedValue: (i) =>
+      formatCurrencyHNL(Number(i.amount_due ?? 0)),
+  },
+  {
+    id: "amount_paid",
+    label: "Pagado",
+    calculatedValue: (i) =>
+      formatCurrencyHNL(Number(i.amount_paid ?? 0)),
+  },
+  {
+    id: "balance_due",
+    label: "Saldo",
+      calculatedValue: (i) =>
+      formatCurrencyHNL(Number(i.balance_due ?? 0)),
+  },
+  {
+    id: "due_date",
+    label: "Vence",
+    format: "date",
+  },
+  {
+    id: "status",
+    label: "Estado",
+    calculatedValue: (i) =>
+      UtilLookup.getLabelFromValue(
+        FINANCE_CHARGE_STATUS_LOOKUP,
+        i.status,
+      ),
+  },
+];
+
+export const FINANCE_TRANSACTIONS_TABLE_COLUMNS: Column[] = [
+  {
+    id: "charges",
+    label: "Cargos",
+    calculatedValue: (row) =>
+      row.finance_transaction_allocations
+        ?.map((a: any) => a.finance_charges?.description)
+        .filter(Boolean)
+        .join(", ") || "—",
+  },
+  {
+    id: "payment_date",
+    label:  "Fecha Pago",
+  },
+  {
+    id: "method",
+    label: "Método",
+    calculatedValue: (i) =>
+    UtilLookup.getLabelFromValue(PAYMENT_METHOD_LOOKUP, i.method),
+  },
+  {
+    id: "reference",
+    label: "Referencia",
+  },
+  {    
+    id: "amount_total",
+    label: "Total",
+    calculatedValue: (i) => formatCurrencyHNL(Number(i.amount_total)),
+  },
+  {
+    id: "notes",
+    label: "Notas",
+  },
+];
+

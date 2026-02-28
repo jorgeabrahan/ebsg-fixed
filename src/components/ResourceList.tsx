@@ -20,6 +20,10 @@ export default function ResourceList<K extends PublicTable>({
   order = { column: "created_at", ascending: false },
   pageSize = 20,
   sortableColumns = [],
+  selectionEnabled = false,
+  onSelectionChange,
+  headerActions,
+  hideTitle = false
 }: {
   table: K;
   columns: Column[];
@@ -34,6 +38,10 @@ export default function ResourceList<K extends PublicTable>({
   };
   pageSize?: number;
   sortableColumns?: { value: string; label: string }[];
+  selectionEnabled?: boolean;
+  onSelectionChange?: (ids: string[], items: Record<string, any>[]) => void;
+  headerActions?: preact.ComponentChildren;
+  hideTitle?: boolean;
 }) {
   const [items, setItems] = useState<Tables<K>[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -116,6 +124,8 @@ export default function ResourceList<K extends PublicTable>({
 
       <Table
         title={title}
+        hideTitle={hideTitle}
+        headerActions={headerActions}
         table={table}
         columns={columns}
         items={items}
@@ -124,6 +134,8 @@ export default function ResourceList<K extends PublicTable>({
           redirectEdit ? (itemId) => route(redirectEdit(itemId)) : undefined
         }
         onReload={fetchItems}
+        isSelectable={selectionEnabled}
+        onSelectionChange={onSelectionChange}
       />
 
       {totalPages > 1 && (

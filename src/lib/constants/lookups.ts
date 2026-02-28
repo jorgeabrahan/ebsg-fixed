@@ -29,3 +29,15 @@ export const SCHOOL_ENROLLMENT_STATUS_LOOKUP = [
   { label: "Graduado", value: "graduated" },
   { label: "Abandono", value: "dropped_out" },
 ] as const;
+
+export const FINANCE_CHARGE_STATUS_LOOKUP = [
+  { label: "Pendiente", value: "open" },
+  { label: "Parcialmente pagado", value: "partially_paid" },
+  { label: "Pagado", value: "paid" },
+  { label: "Anulado", value: "void" },
+] as const;
+
+export const PAYMENT_METHOD_LOOKUP = [
+  { label: "Efectivo", value: "cash" },
+  { label: "Transferencia", value: "transfer" },
+];

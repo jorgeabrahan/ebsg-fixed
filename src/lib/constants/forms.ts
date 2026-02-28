@@ -1,4 +1,4 @@
-import type { SelectField, TextAreaField, TextField } from "../types/forms";
+import type { SelectField, TextAreaField, TextField, ArrayField } from "../types/forms";
 import { UtilFieldFormatter } from "../utils/UtilFieldFormatter";
 import { UtilFieldValidator } from "../utils/UtilFieldValidator";
 import { UtilLookup } from "../utils/UtilLookup";
@@ -39,6 +39,7 @@ export const STUDENT_BASE_FIELDS: (TextField | SelectField)[] = [
   },
   {
     label: "Sexo",
+    type: "select",
     id: "gender",
     name: "gender",
     defaultValue: "-- Selecciona un sexo --",
@@ -134,6 +135,7 @@ export const STUDENT_CONTACT_BASE_FIELDS: (TextField | SelectField)[] = [
   },
   {
     label: "Relación",
+    type: "select",
     id: "relation_type",
     name: "relation_type",
     defaultValue: "-- Seleccione --",
@@ -202,6 +204,7 @@ export const STUDENT_SCHOOL_ENROLLMENT_BASE_FIELDS: (
   },
   {
     label: "Status",
+    type: "select",
     id: "status",
     name: "status",
     defaultValue: "-- Seleccione --",
@@ -223,6 +226,7 @@ export const SCHOOL_GRADES_BASE_FIELDS: (
   },
   {
     label: "Descripción",
+    type: "textArea",
     id: "description",
     name: "description",
     rows: 3,
@@ -278,6 +282,7 @@ export const ACADEMIC_YEARS_BASE_FIELDS: (
 export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS: (
   | TextField
   | SelectField
+  | ArrayField
 )[] = [
   {
     label: "Año academico",
@@ -299,13 +304,13 @@ export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS: (
     table: "finance_fee_types",
     select: "id, code, periodicity",
     searchColumns: ["code"],
-    where: [
+    /*where: [
       {
         column: "periodicity",
         operator: "neq",
         value: "adhoc",
       },
-    ],
+    ],*/
     getReferenceLabel: (item) =>
       `${item.code} - ${UtilLookup.getLabelFromValue(PERIODICITY_LOOKUP, item.periodicity)}`,
     referenceListPath: ROUTES.financeFeeTypes.path,
@@ -323,9 +328,46 @@ export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS: (
     getReferenceLabel: (item) => item.name,
     referenceListPath: ROUTES.schoolGrades.path,
     getReferenceEditPath: (itemId) => ROUTES.schoolGrade.build(itemId),
-    required: true,
     orderColumn: "name",
     orderAscending: false,
+    requiredWhen: (values) => {
+      const periodicity = values.fee_type_id?._meta?.periodicity;
+      if (!periodicity) return false;
+      return periodicity !== "once-per-year" && periodicity !== "adhoc";
+    },
+    visibleWhen: (values) => {
+      const periodicity = values.fee_type_id?._meta?.periodicity;
+      // Se oculta si aun no hay fee_type seleccionado
+      if (!periodicity) return false;
+      return periodicity !== "once-per-year";
+    }
+  },
+  {
+    label: "Inicio del periodo mensual",
+    id: "start_date",
+    name: "start_date",
+    type: "date",
+    required: true, 
+    validation: UtilFieldValidator.date,
+    visibleWhen: (values) => {
+      const periodicity = values.fee_type_id?._meta?.periodicity;
+      return periodicity === "monthly";
+    },
+  },
+  {
+    label: "Fin del periodo mensual",
+    id: "end_date",
+    name: "end_date",
+    type: "date",
+    required: true,
+    validation: UtilFieldValidator.compose(
+      UtilFieldValidator.date,
+      UtilFieldValidator.endDateAfterStart,
+    ),
+    visibleWhen: (values) => {
+      const periodicity = values.fee_type_id?._meta?.periodicity;
+      return periodicity === "monthly";
+    },
   },
   {
     label: "Monto",
@@ -335,18 +377,42 @@ export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS: (
     required: true,
     validation: UtilFieldValidator.amount,
   },
+  {
+    label: "Fechas de cargos",
+    id: "occurrences",
+    name: "occurrences",
+    type: "array",
+    of: { type: "date" },
+
+    requiredWhen: (values) => {
+      const periodicity = values.fee_type_id?._meta?.periodicity;
+      return periodicity === "adhoc";
+    },
+
+    visibleWhen: (values) => {
+      const periodicity = values.fee_type_id?._meta?.periodicity;
+      return periodicity === "adhoc";
+    },
+    validation: UtilFieldValidator.compose(
+      UtilFieldValidator.arrayOf(
+        (params) => UtilFieldValidator.date(params),
+        {
+          required: true,
+          minItems: 1,
+        },
+      ),
+      UtilFieldValidator.uniqueValues(),
+    ),
+  },
 ];
 
-export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_EDIT_FIELDS: (
-  | TextField
-  | SelectField
-)[] = ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS.map((f) => {
-  if (f.id === "amount") return f;
-  return {
-    ...f,
-    isDisabledByDefault: true,
-  };
-});
+export const ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_EDIT_FIELDS =
+  ACADEMIC_YEAR_FINANCE_FEE_SCHEDULE_BASE_FIELDS
+    .filter((f) => f.id !== "occurrences")
+    .map((f) => {
+      if (f.id === "amount") return f;
+      return { ...f, isDisabledByDefault: true };
+    });
 
 export const FINANCE_FEE_TYPES_BASE_FIELDS: (
   | TextField
@@ -362,6 +428,7 @@ export const FINANCE_FEE_TYPES_BASE_FIELDS: (
   },
   {
     label: "Periodicidad",
+    type: "select",
     id: "periodicity",
     name: "periodicity",
     defaultValue: "-- Seleccione --",

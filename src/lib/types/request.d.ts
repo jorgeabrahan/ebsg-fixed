@@ -1,7 +1,11 @@
 import type { PostgrestError } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
 
-type PublicTable = keyof Database["public"]["Tables"];
+type PublicSchema = Database["public"];
+
+export type PublicTable =
+  | keyof PublicSchema["Tables"]
+  | keyof PublicSchema["Views"];
 
 export type CrudResponseTemplate<T> = {
   isSuccess: boolean;

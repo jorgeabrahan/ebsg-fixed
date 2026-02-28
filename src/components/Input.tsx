@@ -47,7 +47,7 @@ export const Input = ({
   getReferenceEditPath?: (itemId: string) => string;
   orderColumn?: string;
   orderAscending?: boolean;
-  handleValueChange: (value: string | boolean) => void;
+  handleValueChange: (value: string | boolean, meta?: Record<string, any>) => void;
   variant?: FieldSizeVariants;
 } & ComponentProps<"input">) => {
   const [showReferenceList, setShowReferenceList] = useState(false);
@@ -146,7 +146,7 @@ export const Input = ({
     setReferenceList(cachedBaseList);
     setHighlightIndex(-1);
     setShowReferenceList(false);
-    handleValueChange(selected.reference);
+    handleValueChange(selected.reference, i);
   };
 
   // --------------------

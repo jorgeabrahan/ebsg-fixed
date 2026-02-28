@@ -7,9 +7,14 @@ export const PageAcademicYearFinanceFeeSchedule = ({
   academicYearId,
   financeFeeScheduleId,
 }: {
-  academicYearId: string;
-  financeFeeScheduleId: string;
+  academicYearId?: string;
+  financeFeeScheduleId?: string;
 }) => {
+  const onBeforeUpdate = (entries: Record<string, any>) => {
+    const { occurrences, ...schedule } = entries;
+    return schedule;
+  };
+
   return (
     <WrapperDelimiter>
       <ResourceEdit<"finance_fee_schedules">
@@ -22,7 +27,8 @@ export const PageAcademicYearFinanceFeeSchedule = ({
             ? ROUTES.academicYear.build(academicYearId)
             : ROUTES.academicYears.path
         }
-        submitLabel="Editar contacto"
+        submitLabel="Editar política"
+        onBeforeUpdate={onBeforeUpdate}
       />
     </WrapperDelimiter>
   );

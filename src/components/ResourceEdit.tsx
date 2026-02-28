@@ -17,6 +17,7 @@ export default function ResourceEdit<K extends PublicTable>({
   redirectTo,
   submitLabel,
   select = "*",
+  onBeforeUpdate,
 }: {
   id?: string;
   table: K;
@@ -24,6 +25,7 @@ export default function ResourceEdit<K extends PublicTable>({
   redirectTo: string;
   submitLabel: string;
   select?: string;
+  onBeforeUpdate?: (entries: Record<string, any>) => Record<string, any>;
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [clonedFields, setClonedFields] =
@@ -104,8 +106,12 @@ export default function ResourceEdit<K extends PublicTable>({
       return;
     }
 
+    const cleanedEntries = onBeforeUpdate
+    ? onBeforeUpdate(sanitizedEntries)
+    : sanitizedEntries;
+
     const payload = {
-      ...sanitizedEntries,
+      ...cleanedEntries,
       id: Number(id),
     } as Tables<K>;
 

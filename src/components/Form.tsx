@@ -2,10 +2,12 @@ import type { FormDefinition } from "../lib/types/forms";
 import { Input } from "./Input";
 import { PrimaryButton } from "./PrimaryButton";
 import { Select } from "./Select";
-import { isSelectField, isTextAreaField } from "../lib/typeGuards/forms";
+import { isSelectField, isTextAreaField,  isArrayField, } from "../lib/typeGuards/forms";
 import type { TargetedSubmitEvent } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { TextArea } from "./TextArea";
+import {  ArrayFieldRenderer } from "./Array";
+
 
 export const Form = ({
   fields,
@@ -17,14 +19,16 @@ export const Form = ({
 }: FormDefinition & { className?: string; isDisabled?: boolean }) => {
   const buildInitialValues = (fields: FormDefinition["fields"]) => {
     const obj: Record<string, any> = {};
-
+    
     fields.forEach((f) => {
-      if (!isSelectField(f) && !isTextAreaField(f) && f?.type === "checkbox") {
-        obj[f.name] = Boolean(f.value);
+      const fieldValue = "value" in f ? f.value : undefined;
+
+      if (!isSelectField(f) && !isTextAreaField(f) && f.type === "checkbox") {
+        obj[f.name] = Boolean(fieldValue);
         return;
       }
 
-      obj[f.name] = f.value ?? "";
+      obj[f.name] = fieldValue ?? "";
     });
 
     return obj;
@@ -52,13 +56,27 @@ export const Form = ({
   };
   const sanitizeFields = (entries: Record<string, any>) => {
     const sanitizedEntries: Record<string, any> = {};
-    fields.map((f) => {
-      if (f == null || typeof f?.name !== "string") return;
-      if (typeof f?.outputFormat === "function") {
-        sanitizedEntries[f.name] = f.outputFormat(entries[f.name]);
+
+    fields.forEach((f) => {
+      if (f == null || typeof f.name !== "string") return;
+
+      const value = entries[f.name];
+
+      if (typeof f.outputFormat === "function") {
+        sanitizedEntries[f.name] = f.outputFormat(value);
+        return;
       }
+
+      // { id, _meta } → id
+      if (value && typeof value === "object" && "id" in value) {
+        sanitizedEntries[f.name] = value.id;
+        return;
+      }
+
+      sanitizedEntries[f.name] = value;
     });
-    return { ...entries, ...sanitizedEntries };
+
+    return sanitizedEntries;
   };
   const validateFields = (
     sanitizedEntries: Record<string, any>,
@@ -66,6 +84,10 @@ export const Form = ({
   ) => {
     const tempValidationResults = fields.map((f) => {
       const inputName = typeof f.name === "string" ? f.name : String(f.name);
+
+      if (!isFieldVisible(f, originalEntries)) {
+        return { inputName, isSuccess: true };
+      }
 
       if (typeof f?.validation === "function") {
         return {
@@ -99,16 +121,68 @@ export const Form = ({
     }
   };
 
-  const handleValueChange = (name: string, value: any) => {
-    setValues((v) => ({ ...v, [name]: value }));
+  const handleValueChange = (
+    name: string,
+    value: any,
+    meta?: Record<string, any>
+  ) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: meta
+        ? { id: value, _meta: meta }
+        : value,
+    }));
   };
+
+  const visibleFields = fields.filter((field) =>
+    typeof field.visibleWhen === "function" ? field.visibleWhen(values) : true
+  );
+
+  const isFieldVisible = (
+    field: FormDefinition["fields"][number],
+    values: Record<string, any>
+  ) => {
+    if (typeof field.visibleWhen !== "function") return true;
+    return field.visibleWhen(values);
+  };
+
+  useEffect(() => {
+    setValues((prev) => {
+      let changed = false;
+      const next = { ...prev };
+
+      fields.forEach((field) => {
+        if (!field.name) return;
+
+        const visible = isFieldVisible(field, prev);
+
+        if (!visible && prev[field.name] != null) {
+          next[field.name] = null;
+          changed = true;
+        }
+      });
+
+      return changed ? next : prev;
+    });
+  }, [values, fields]);
 
   return (
     <form
       className={`flex flex-col gap-6 pt-4 pb-8 ${className}`}
       onSubmit={onSubmitMiddleware}
     >
-      {fields.map((field) => {
+      {visibleFields.map((field) => {
+        if (isArrayField(field)) {
+          return (
+            <ArrayFieldRenderer
+              field={field}
+              value={values[field.name]}
+              onChange={(v) => handleValueChange(field.name, v)}
+              disabled={isDisabled || field.isDisabledByDefault}
+            />
+          );
+        }
+
         if (isSelectField(field)) {
           return (
             <Select
@@ -134,7 +208,9 @@ export const Form = ({
           <Input
             {...field}
             value={values[field.name]}
-            handleValueChange={(v) => handleValueChange(field.name, v)}
+            handleValueChange={(v, meta) =>
+              handleValueChange(field.name, v, meta)
+            }
             validationErrors={validationResults}
           />
         );
