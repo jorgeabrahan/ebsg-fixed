@@ -178,6 +178,8 @@ export function PaymentModal() {
       });
 
       setReceiptData(formatted);
+      paymentModalOptions.value.onSuccess?.();
+      isShowingPaymentModal.value = false;
 
     } catch (err) {
       console.error(err);

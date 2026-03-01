@@ -9,13 +9,11 @@ import {
   FINANCE_TRANSACTIONS_TABLE_COLUMNS,
 } from "../../../lib/constants/tables";
 import { useState } from "preact/hooks";
-
 import {
   isShowingPaymentModal,
   paymentModalOptions,
 } from "../../../stores/paymentModal";
 import { PrimaryButton } from "../../../components/PrimaryButton";
-
 import type { Database } from "../../../lib/types/database.types";
 import type { Charge } from "../../../stores/paymentModal";
 
@@ -31,6 +29,8 @@ export const PageStudentSchoolEnrollment = ({
 }) => {
   const [selectedCharges, setSelectedCharges] =
     useState<FinanceChargeWithBalance[]>([]);
+
+  const [refreshKey, setRefreshKey] = useState(0);
 
   return (
     <WrapperDelimiter>
@@ -58,6 +58,7 @@ export const PageStudentSchoolEnrollment = ({
               content: (
                 <>
                   <ResourceList
+                    key={`charges-${refreshKey}`}
                     title="Cargos Financieros"
                     hideTitle
                     headerActions={
@@ -83,6 +84,7 @@ export const PageStudentSchoolEnrollment = ({
                             charges: adaptedCharges,
                             onSuccess: () => {
                               setSelectedCharges([]);
+                              setRefreshKey(prev => prev + 1)
                             },
                           };
 
@@ -128,6 +130,7 @@ export const PageStudentSchoolEnrollment = ({
                     id: "payments",
                     content: (
                       <ResourceList
+                        key={`charges-${refreshKey}`}
                         title="Pagos Financieros"
                         hideTitle
                         table="finance_transactions"
