@@ -47,7 +47,7 @@ export const Input = ({
   getReferenceEditPath?: (itemId: string) => string;
   orderColumn?: string;
   orderAscending?: boolean;
-  handleValueChange: (value: string | boolean, meta?: Record<string, any>) => void;
+  handleValueChange?: (value: string | boolean, meta?: Record<string, any>) => void;
   variant?: FieldSizeVariants;
 } & ComponentProps<"input">) => {
   const [showReferenceList, setShowReferenceList] = useState(false);
@@ -146,7 +146,7 @@ export const Input = ({
     setReferenceList(cachedBaseList);
     setHighlightIndex(-1);
     setShowReferenceList(false);
-    handleValueChange(selected.reference, i);
+    handleValueChange?.(selected.reference, i);
   };
 
   // --------------------
@@ -294,7 +294,7 @@ export const Input = ({
       reference,
     });
 
-    handleValueChange(reference);
+    handleValueChange?.(reference);
   }, [reference, props?.value]);
 
   return (
@@ -337,12 +337,12 @@ export const Input = ({
 
               if (isSelector) {
                 const checked = (e.target as HTMLInputElement).checked;
-                handleValueChange(checked);
+                handleValueChange?.(checked);
                 return;
               }
 
               props.onChange?.(e);
-              handleValueChange((e.target as HTMLInputElement).value);
+              handleValueChange?.((e.target as HTMLInputElement).value);
             }}
             onFocus={onFocus}
             onBlur={onBlur}
