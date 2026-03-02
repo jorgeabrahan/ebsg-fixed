@@ -34,6 +34,11 @@ export const PageStudents = () => {
             value: "last_name",
           },
         ]}
+        searchableColumns={[
+          "first_name",
+          "last_name",
+          "code"
+        ]}
       />
     </WrapperDelimiter>
   );

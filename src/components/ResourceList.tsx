@@ -23,7 +23,9 @@ export default function ResourceList<K extends PublicTable>({
   selectionEnabled = false,
   onSelectionChange,
   headerActions,
-  hideTitle = false
+  hideTitle = false,
+  searchableColumns = [],
+  searchPlaceholder
 }: {
   table: K;
   columns: Column[];
@@ -42,6 +44,8 @@ export default function ResourceList<K extends PublicTable>({
   onSelectionChange?: (ids: string[], items: Record<string, any>[]) => void;
   headerActions?: preact.ComponentChildren;
   hideTitle?: boolean;
+  searchableColumns?: string[];
+  searchPlaceholder?: string;
 }) {
   const [items, setItems] = useState<Tables<K>[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -52,6 +56,8 @@ export default function ResourceList<K extends PublicTable>({
   const [orderBy, setOrderBy] = useState(order.column);
   const [ascending, setAscending] = useState(order.ascending);
 
+  const [search, setSearch] = useState("");
+
   const fetchItems = async () => {
     const { isSuccess, data, error, count } = await ServiceCRUD.read<K>(table, {
       select,
@@ -61,6 +67,13 @@ export default function ResourceList<K extends PublicTable>({
         column: orderBy,
         ascending,
       },
+      search:
+        search && searchableColumns.length > 0
+          ? {
+              columns: searchableColumns,
+              query: search,
+            }
+          : undefined,
     });
 
     if (isSuccess && data) {
@@ -77,6 +90,7 @@ export default function ResourceList<K extends PublicTable>({
     table,
     select,
     JSON.stringify(where),
+    search,
     orderBy,
     ascending,
     page,
@@ -87,6 +101,7 @@ export default function ResourceList<K extends PublicTable>({
       {sortableColumns.length > 0 && (
         <div className="flex flex-col md:flex-row md:items-center gap-3 mb-6 md:mb-3">
           <Select
+            type="select"
             id={`orderBy${table}`}
             name={`orderBy${table}`}
             label="Ordenar por"
@@ -99,6 +114,7 @@ export default function ResourceList<K extends PublicTable>({
             variant="md"
           />
           <Select
+            type="select"
             id={`orderBy${table}`}
             name={`orderBy${table}`}
             label=""
@@ -118,6 +134,21 @@ export default function ResourceList<K extends PublicTable>({
               },
             ]}
             variant="md"
+          />
+        </div>
+      )}
+
+      {searchableColumns && searchableColumns.length > 0 && (
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder={searchPlaceholder || "Buscar..."}
+            value={search}
+            onInput={(e) => {
+              setPage(1);
+              setSearch(e.currentTarget.value);
+            }}
+            className="w-full md:w-80 rounded-lg border border-dark-800 bg-dark-925 px-3 py-2 text-sm"
           />
         </div>
       )}
