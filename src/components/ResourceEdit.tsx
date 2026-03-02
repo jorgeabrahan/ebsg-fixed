@@ -1,6 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
 import type { FormDefinition } from "../lib/types/forms";
-import type { PublicTable } from "../lib/types/request";
 import { ServiceCRUD } from "../services/ServiceCRUD";
 import { route } from "preact-router";
 import { Form } from "./Form";
@@ -10,7 +9,11 @@ import { toast } from "sonner";
 import type { Tables } from "../lib/types/database.types";
 import { isSelectField, isTextAreaField } from "../lib/typeGuards/forms";
 
-export default function ResourceEdit<K extends PublicTable>({
+import type { Database } from "../lib/types/database.types";
+
+type TableName = keyof Database["public"]["Tables"];
+
+export default function ResourceEdit<K extends TableName>({
   id,
   table,
   fields,

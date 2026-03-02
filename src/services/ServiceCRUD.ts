@@ -7,6 +7,8 @@ import type {
 } from "../lib/types/request";
 import type { Database, Tables } from "../lib/types/database.types";
 
+type TableName = keyof Database["public"]["Tables"];
+
 export class ServiceCRUD {
   static async create<K extends PublicTable>(
     table: K,
@@ -33,7 +35,7 @@ export class ServiceCRUD {
     }
   }
 
-  static async update<K extends PublicTable>(
+  static async update<K extends TableName>(
     table: K,
     item: Database["public"]["Tables"][K]["Update"],
   ): Promise<CrudResponseTemplate<Tables<K>>> {
