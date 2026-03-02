@@ -4,18 +4,21 @@ import { ROUTES } from "../../../lib/constants/routes";
 import { WrapperDelimiter } from "../../../wrappers/WrapperDelimiter";
 import { CTabs } from "../../../components/CTabs";
 import ResourceList from "../../../components/ResourceList";
+import { PrimaryButton } from "../../../components/PrimaryButton";
+import type { Database } from "../../../lib/types/database.types";
+import type { Charge } from "../../../stores/paymentModal";
+import { useState } from "preact/hooks";
+import { UtilReceiptID } from "../../../lib/utils/UtilReceiptID"
+import { PaymentReceipt } from "../../../components/PaymentReceipt";
 import {
   FINANCE_CHARGES_TABLE_COLUMNS,
   FINANCE_TRANSACTIONS_TABLE_COLUMNS,
 } from "../../../lib/constants/tables";
-import { useState } from "preact/hooks";
+
 import {
   isShowingPaymentModal,
   paymentModalOptions,
 } from "../../../stores/paymentModal";
-import { PrimaryButton } from "../../../components/PrimaryButton";
-import type { Database } from "../../../lib/types/database.types";
-import type { Charge } from "../../../stores/paymentModal";
 
 type FinanceChargeWithBalance =
   Database["public"]["Views"]["finance_charges_with_balance"]["Row"];
@@ -31,6 +34,21 @@ export const PageStudentSchoolEnrollment = ({
     useState<FinanceChargeWithBalance[]>([]);
 
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedPayments, setSelectedPayments] = useState<any[]>([]);
+  const [receiptData, setReceiptData] = useState<any[] | null>(null);
+
+    async function handleGenerateReceipts() {
+    if (!selectedPayments.length) return;
+
+    try {
+      const ids = selectedPayments.map((p: any) => p.id);
+      const formatted = await UtilReceiptID(ids);
+      setReceiptData(formatted);
+    } catch (err) {
+      console.error(err);
+      alert("Error al generar factura");
+    }
+  }
 
   return (
     <WrapperDelimiter>
@@ -130,9 +148,20 @@ export const PageStudentSchoolEnrollment = ({
                     id: "payments",
                     content: (
                       <ResourceList
-                        key={`charges-${refreshKey}`}
+                        key={`payments-${refreshKey}`}
                         title="Pagos Financieros"
                         hideTitle
+                        headerActions={
+                          <PrimaryButton
+                            size="lg"
+                            className="ml-auto"
+                            onClick={handleGenerateReceipts}
+                            disabled={!selectedPayments.length}
+                          >
+                            Generar factura
+                          </PrimaryButton>
+                        }
+                        
                         table="finance_transactions"
                         columns={FINANCE_TRANSACTIONS_TABLE_COLUMNS}
                         select={`
@@ -153,6 +182,10 @@ export const PageStudentSchoolEnrollment = ({
                             value: studentId,
                           },
                         ]}
+                        selectionEnabled
+                        onSelectionChange={(_, items) =>
+                          setSelectedPayments(items)
+                        }
                       />
                     ),
                   },
@@ -161,6 +194,12 @@ export const PageStudentSchoolEnrollment = ({
           ]}
         />
       )}
+      
+    {receiptData && (
+      <div class="hidden">
+        <PaymentReceipt receipts={receiptData} />
+      </div>
+    )}
     </WrapperDelimiter>
   );
 };
