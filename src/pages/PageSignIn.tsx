@@ -36,7 +36,10 @@ export const PageSignIn = () => {
       as="main"
       className="min-h-screen flex flex-col justify-center relative"
     >
-      <form onSubmit={onSubmit}>
+      <form 
+        onSubmit={onSubmit}
+        className="w-full max-w-sm mx-auto"
+      >
         <Input
           className="mb-6"
           label="Correo"
