@@ -114,3 +114,13 @@ input[type="checkbox"] {
 .sidebar > div::-webkit-scrollbar-thumb {
   @apply bg-contrast/20 rounded-full;
 }
+
+.sidebar a,
+.sidebar button {
+  @apply text-contrast;
+}
+
+.sidebar a:hover,
+.sidebar button:hover {
+  @apply text-contrast bg-dark-900;
+}
