@@ -20,7 +20,9 @@ export default function ResourceCreate<K extends PublicTable>({
   fields: FormDefinition["fields"];
   redirectTo: string;
   submitLabel: string;
-  onBeforeCreate?: (entries: Record<string, any>) => Record<string, any>;
+  onBeforeCreate?: (
+    entries: Record<string, any>,
+  ) => Record<string, any> | [Record<string, any>, boolean];
   onAfterCreate?: (
     created: Tables<K>,
     rawEntries: Record<string, any>,
@@ -33,11 +35,31 @@ export default function ResourceCreate<K extends PublicTable>({
   }: {
     sanitizedEntries: Record<string, any>;
   }) => {
-    setIsCreating(true);
 
-    const entries = onBeforeCreate
-      ? onBeforeCreate(sanitizedEntries)
-      : sanitizedEntries;
+    let entries: Record<string, any> = sanitizedEntries;
+    let shouldSubmit = true;
+
+    try {
+      if (onBeforeCreate) {
+        const result = onBeforeCreate(sanitizedEntries);
+
+        if (Array.isArray(result)) {
+          const [processedEntries, submit] = result;
+
+          entries = processedEntries;
+          shouldSubmit = submit;
+        } else {
+          entries = result;
+        }
+      }
+    } catch (e: any) {
+      toast.error(e?.message || "Error al preparar los datos");
+      return;
+    }
+
+    if (!shouldSubmit) return;
+
+    setIsCreating(true);
 
     const { isSuccess, data, error } = await ServiceCRUD.create<K>(
       table,
